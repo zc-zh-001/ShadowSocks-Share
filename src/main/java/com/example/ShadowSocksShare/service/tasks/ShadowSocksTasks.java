@@ -27,73 +27,82 @@ public class ShadowSocksTasks {
 
 	@Autowired
 	@Qualifier("iShadowCrawlerServiceImpl")
-	private ShadowSocksCrawlerService iShadowCrawlerServiceImpl;    // ishadow
+	private ShadowSocksCrawlerService iShadowCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("doubCrawlerServiceImpl")
-	private ShadowSocksCrawlerService doubCrawlerServiceImpl;                // https://doub.io
+	private ShadowSocksCrawlerService doubCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("freeSS_EasyToUseCrawlerServiceImpl")
-	private ShadowSocksCrawlerService freeSS_EasyToUseCrawlerServiceImpl;                // https://freess.cx/#portfolio-preview
+	private ShadowSocksCrawlerService freeSS_EasyToUseCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("ss8ServiceImpl")
-	private ShadowSocksCrawlerService ss8ServiceImpl;                // https://en.ss8.fun/
+	private ShadowSocksCrawlerService ss8ServiceImpl;
 	@Autowired
 	@Qualifier("freeSSRCrawlerServiceImpl")
-	private ShadowSocksCrawlerService freeSSRCrawlerServiceImpl;                // https://global.ishadowx.net/
+	private ShadowSocksCrawlerService freeSSRCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("free_ssServiceImpl")
-	private ShadowSocksCrawlerService free_ssServiceImpl;                // https://free-ss.site/
+	private ShadowSocksCrawlerService free_ssServiceImpl;
 	@Autowired
 	@Qualifier("ssrBlueCrawlerServiceImpl")
-	private ShadowSocksCrawlerService ssrBlueCrawlerServiceImpl;                // http://www.ssr.blue/
+	private ShadowSocksCrawlerService ssrBlueCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("free_yitianjianssCrawlerServiceImpl")
-	private ShadowSocksCrawlerService free_yitianjianssCrawlerServiceImpl;                // https://free.yitianjianss.com/
+	private ShadowSocksCrawlerService free_yitianjianssCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("promPHPCrawlerServiceImpl")
-	private ShadowSocksCrawlerService promPHPCrawlerServiceImpl;                // https://prom-php.herokuapp.com/cloudfra_ssr.txt
+	private ShadowSocksCrawlerService promPHPCrawlerServiceImpl;
 
 
+	// https://global.ishadowx.net/
 	@Scheduled(cron = "0 10 0/3 * * ?")
 	public void iShadowCrawler() {
 		shadowSocksSerivce.crawlerAndSave(iShadowCrawlerServiceImpl);
 	}
 
+	// https://doub.io
 	@Scheduled(cron = "0 10 0/6 * * ?")
 	public void doubCrawler() {
 		shadowSocksSerivce.crawlerAndSave(doubCrawlerServiceImpl);
 	}
 
+	// https://freess.cx/#portfolio-preview
 	@Scheduled(cron = "0 10 0/12 * * ?")
 	public void freeSS_EasyToUseCrawler() {
 		shadowSocksSerivce.crawlerAndSave(freeSS_EasyToUseCrawlerServiceImpl);
 	}
 
+	// https://en.ss8.fun/
 	@Scheduled(cron = "0 10 0/4 * * ?")
 	public void ss8Crawler() {
 		shadowSocksSerivce.crawlerAndSave(ss8ServiceImpl);
 	}
 
+	// https://freessr.win/
 	@Scheduled(cron = "0 10 0/6 * * ?")
 	public void freeSSRCrawler() {
 		shadowSocksSerivce.crawlerAndSave(freeSSRCrawlerServiceImpl);
 	}
 
+	// https://free-ss.site/
 	@Scheduled(cron = "0 10 0/6 * * ?")
 	public void free_ssCrawler() {
 		shadowSocksSerivce.crawlerAndSave(free_ssServiceImpl);
 	}
 
+	// https://www.52ssr.cn/
 	@Scheduled(cron = "0 10 0/3 * * ?")
 	public void ssrBlueCrawler() {
 		shadowSocksSerivce.crawlerAndSave(ssrBlueCrawlerServiceImpl);
 	}
 
+	// https://free.yitianjianss.com/
 	@Scheduled(cron = "0 10 0/3 * * ?")
 	public void free_yitianjianssCrawler() {
 		shadowSocksSerivce.crawlerAndSave(free_yitianjianssCrawlerServiceImpl);
 	}
 
+	// https://prom-php.herokuapp.com/cloudfra_ssr.txt
 	@Scheduled(cron = "0 10 0/3 * * ?")
 	public void promPHPCrawler() {
 		shadowSocksSerivce.crawlerAndSave(promPHPCrawlerServiceImpl);

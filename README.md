@@ -23,7 +23,7 @@
 
 ### Android
 
-1. [下载](https://github.com/shadowsocksrr/shadowsocksr-android/releases) 客户端，安装、启动
+1. [下载](https://github.com/shadowsocksrr/shadowsocksr-android/releases)客户端，安装、启动
 1. 添加订阅地址
 1. 确定并升级
 
@@ -55,7 +55,7 @@ https://freess.cx/ | 是 | 从 0 点 10 分开始，每 12 小时
 https://en.ss8.fun/ | 是 | 从 0 点 10 分开始，每 4 小时
 https://freessr.win/ | 是 | 从 0 点 10 分开始，每 6 小时
 https://free-ss.site/ | 是 | 从 0 点 10 分开始，每 6 小时
-http://www.ssr.blue/ | 是 | 从 0 点 10 分开始，每 3 小时
+https://www.52ssr.cn/ | 是 | 从 0 点 10 分开始，每 3 小时
 https://free.yitianjianss.com/ | 是 | 从 0 点 10 分开始，每 3 小时
 https://cloudfra.com/ | 是 | 从 0 点 10 分开始，每 3 小时
 
