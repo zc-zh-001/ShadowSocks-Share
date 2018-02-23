@@ -129,32 +129,29 @@
         <plugins>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-verbose</arg>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <fork>true</fork>
                     <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
                 </configuration>
-                <executions>
-                    <execution>
-                        <!--<goals>
-                            <goal>build-info</goal>
-                        </goals>-->
-                        <configuration>
-                            <additionalProperties>
-                                <encoding.source>UTF-8</encoding.source>
-                                <encoding.reporting>UTF-8</encoding.reporting>
-                                <source>${java.version}</source>
-                                <target>${java.version}</target>
-                            </additionalProperties>
-                            <compilerArgs>
-                                <arg>-Xlint:all</arg>
-                            </compilerArgs>
-                            <showWarnings>true</showWarnings>
-                            <showDeprecation>true</showDeprecation>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

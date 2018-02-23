@@ -23,29 +23,28 @@ public class DoubCrawlerServiceImpl extends ShadowSocksCrawlerService {
 
 	// 目标网站 URL
 	private static final String TARGET_URL = "https://doub.io/sszhfx/";
+
 	// 协议
-	private final static Map<String, String> protocolMap = new HashMap() {
-		{
-			put("1", "origin");
-			put("2", "verify_deflate");
-			put("3", "auth_sha1_v4");
-			put("4", "auth_aes128_md5");
-			put("5", "auth_aes128_sha1");
-			put("6", "auth_chain_a");
-			put("7", "auth_chain_b");
-		}
-	};
+	private final static Map<String, String> protocolMap = new HashMap<>();
 	// 混淆
-	private final static Map<String, String> obfsMap = new HashMap() {
-		{
-			put("1", "plain");
-			put("2", "http_simple");
-			put("3", "http_post");
-			put("4", "random_head");
-			put("5", "tls1.2_ticket_auth");
-			put("6", "tls1.2_ticket_fastauth");
-		}
-	};
+	private final static Map<String, String> obfsMap = new HashMap<>();
+
+	static {
+		protocolMap.put("1", "origin");
+		protocolMap.put("2", "verify_deflate");
+		protocolMap.put("3", "auth_sha1_v4");
+		protocolMap.put("4", "auth_aes128_md5");
+		protocolMap.put("5", "auth_aes128_sha1");
+		protocolMap.put("6", "auth_chain_a");
+		protocolMap.put("7", "auth_chain_b");
+
+		obfsMap.put("1", "plain");
+		obfsMap.put("2", "http_simple");
+		obfsMap.put("3", "http_post");
+		obfsMap.put("4", "random_head");
+		obfsMap.put("5", "tls1.2_ticket_auth");
+		obfsMap.put("6", "tls1.2_ticket_fastauth");
+	}
 
 	// 访问目标网站，是否启动代理
 	@Value("${proxy.enable}")
@@ -74,7 +73,7 @@ public class DoubCrawlerServiceImpl extends ShadowSocksCrawlerService {
 			Elements rows = table.select("tr");
 			if (rows.size() > 2) {
 
-				Set<ShadowSocksDetailsEntity> set = new HashSet(rows.size() - 1);
+				Set<ShadowSocksDetailsEntity> set = new HashSet<>(rows.size() - 1);
 				// 从第二行读取
 				for (int i = 1; i < rows.size(); i++) {
 					Elements cols = rows.get(i).select("td");

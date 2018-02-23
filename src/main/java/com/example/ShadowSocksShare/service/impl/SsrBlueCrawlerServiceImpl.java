@@ -14,13 +14,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * https://free-ss.site/
+ * https://www.52ssr.cn/
  */
 @Slf4j
 @Service
 public class SsrBlueCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	// 目标网站 URL
-	private static final String TARGET_URL = "http://www.ssr.blue/";
+	private static final String TARGET_URL = "https://www.52ssr.cn/";
 	// 访问目标网站，是否启动代理
 	@Value("${proxy.enable}")
 	@Getter
@@ -41,7 +41,7 @@ public class SsrBlueCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	protected Set<ShadowSocksDetailsEntity> parse(Document document) {
 		Elements ssList = document.select("a.btn-info");
 
-		Set<ShadowSocksDetailsEntity> set = new HashSet(ssList.size());
+		Set<ShadowSocksDetailsEntity> set = new HashSet<>(ssList.size());
 		for (int i = 0; i < ssList.size(); i++) {
 			try {
 				String ssrLink = ssList.get(i).attr("href");

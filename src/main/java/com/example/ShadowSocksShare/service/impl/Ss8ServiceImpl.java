@@ -43,7 +43,7 @@ public class Ss8ServiceImpl extends ShadowSocksCrawlerService {
 	protected Set<ShadowSocksDetailsEntity> parse(Document document) {
 		Elements ssList = document.select("article");
 
-		Set<ShadowSocksDetailsEntity> set = new HashSet(ssList.size());
+		Set<ShadowSocksDetailsEntity> set = new HashSet<>(ssList.size());
 
 		for (int i = 0; i < ssList.size(); i++) {
 			try {

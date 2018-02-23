@@ -2,7 +2,10 @@ package com.example.ShadowSocksShare.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.persistence.*;
@@ -20,11 +23,11 @@ import java.util.Map;
  * https://vxblue.com/archives/115.html
  */
 @Entity
-@RequiredArgsConstructor
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
+// @RequiredArgsConstructor
+// @NoArgsConstructor
 @EqualsAndHashCode(exclude = {"id", "remarks", "group"})
 public class ShadowSocksDetailsEntity implements Serializable {
 	// SSR 连接 分隔符
@@ -34,30 +37,31 @@ public class ShadowSocksDetailsEntity implements Serializable {
 	// 必填字段
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Setter
 	private long id;
 
 	@Column
-	@NonNull
+	// @NonNull
 	private String server; // 地址
 
 	@Column
-	@NonNull
+	// @NonNull
 	private int server_port;    // 端口
 
 	@Column
-	@NonNull
+	// @NonNull
 	private String password;    // 密码
 
 	@Column
-	@NonNull
+	// @NonNull
 	private String method;    // 加密
 
 	@Column
-	@NonNull
+	// @NonNull
 	private String protocol;    // 协议
 
 	@Column
-	@NonNull
+	// @NonNull
 	private String obfs;    // 混淆
 
 	// 非必填
@@ -76,8 +80,17 @@ public class ShadowSocksDetailsEntity implements Serializable {
 	@Column
 	private String title;        // 网站名
 
+	public ShadowSocksDetailsEntity(String server, int server_port, String password, String method, String protocol, String obfs) {
+		this.server = server;
+		this.server_port = server_port;
+		this.password = password;
+		this.method = method;
+		this.protocol = protocol;
+		this.obfs = obfs;
+	}
+
 	public String getJsonStr() throws JsonProcessingException {
-		Map<String, Object> json = new HashMap();
+		Map<String, Object> json = new HashMap<>();
 		json.put("server", server);
 		json.put("server_port", server_port);
 		json.put("local_address", "127.0.0.1");

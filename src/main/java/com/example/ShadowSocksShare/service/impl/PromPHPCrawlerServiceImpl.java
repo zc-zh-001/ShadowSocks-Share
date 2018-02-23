@@ -66,7 +66,7 @@ public class PromPHPCrawlerServiceImpl extends ShadowSocksCrawlerService {
 		String[] ssrLinkList = ssrLinks.split("\n");
 
 		// log.debug("---------------->{}={}", ssrLinkList.length + "", ssrLinkList);
-		Set<ShadowSocksDetailsEntity> set = new HashSet(ssrLinkList.length);
+		Set<ShadowSocksDetailsEntity> set = new HashSet<>(ssrLinkList.length);
 		for (int i = 0; i < ssrLinkList.length; i++) {
 			try {
 				if (StringUtils.isNotBlank(ssrLinkList[i])) {

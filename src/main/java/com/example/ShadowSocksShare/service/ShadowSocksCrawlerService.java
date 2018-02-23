@@ -70,12 +70,14 @@ public abstract class ShadowSocksCrawlerService {
 	}
 
 	protected Connection getConnection(String url) {
+		@SuppressWarnings("deprecation")
 		Connection connection = Jsoup.connect(url)
 				.userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.108 Safari/537.36")
 				// .referrer("https://www.google.com/")
 				.ignoreContentType(true)
 				.followRedirects(true)
 				.ignoreHttpErrors(true)
+				.validateTLSCertificates(false)
 				.timeout(TIME_OUT);
 		if (isProxyEnable())
 			connection.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(getProxyHost(), getProxyPort())));

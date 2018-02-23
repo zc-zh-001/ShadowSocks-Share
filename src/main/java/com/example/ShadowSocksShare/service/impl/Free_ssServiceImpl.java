@@ -58,16 +58,16 @@ public class Free_ssServiceImpl extends ShadowSocksCrawlerService {
 			if (ssProxyEnable)
 				webClient.getOptions().setProxyConfig(new ProxyConfig(ssProxyHost, ssProxyPort, ssSocks));
 			// 1. 爬取账号
-			webClient.getOptions().setJavaScriptEnabled(true);                // 启动JS
-			webClient.setJavaScriptTimeout(10 * 1000);                            // 设置JS执行的超时时间
-			webClient.getOptions().setUseInsecureSSL(true);                    // 忽略ssl认证
-			webClient.getOptions().setCssEnabled(false);                    // 禁用Css，可避免自动二次请求CSS进行渲染
-			webClient.getOptions().setThrowExceptionOnScriptError(false);   //运行错误时，不抛出异常
-			webClient.getOptions().setTimeout(TIME_OUT);                // 连接超时时间。如果为0，则无限期等待
-			webClient.setAjaxController(new NicelyResynchronizingAjaxController());// 设置Ajax异步
-			webClient.getCookieManager().setCookiesEnabled(true);//开启cookie管理
+			webClient.getOptions().setJavaScriptEnabled(true);                		// 启动 JS
+			webClient.setJavaScriptTimeout(10 * 1000);                            	// 设置 JS 执行的超时时间
+			webClient.getOptions().setUseInsecureSSL(true);                    		// 忽略 SSL 认证
+			webClient.getOptions().setCssEnabled(false);                    		// 禁用 CSS，可避免自动二次请求 CSS 进行渲染
+			webClient.getOptions().setThrowExceptionOnScriptError(false);   		//运行错误时，不抛出异常
+			webClient.getOptions().setTimeout(TIME_OUT);                			// 连接超时时间。如果为 0，则无限期等待
+			webClient.setAjaxController(new NicelyResynchronizingAjaxController());	// 设置 Ajax 异步
+			webClient.getCookieManager().setCookiesEnabled(true);					// 开启 cookie 管理
 
-			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false); // 忽略错误的 Http code
+			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false); 	// 忽略错误的 Http code
 
 			// 模拟浏览器打开一个目标网址
 			HtmlPage htmlPage = webClient.getPage(getTargetURL());
@@ -89,10 +89,10 @@ public class Free_ssServiceImpl extends ShadowSocksCrawlerService {
 			// 2. 解析 json 生成 ShadowSocksDetailsEntity
 			DomNodeList<DomNode> trList = page.querySelectorAll("table tbody tr");
 
-			Set<ShadowSocksDetailsEntity> set = new HashSet(trList.size());
+			Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
 			for (int i = 0; i < trList.size(); i++) {
 				DomNode tr = trList.get(i);
-				log.debug("===============>{}", tr.asText());
+				// log.debug("===============>{}", tr.asText());
 				DomNodeList<DomNode> tdList = tr.querySelectorAll("td");
 				if (tdList.size() > 4) {
 					ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(tdList.get(1).asText(), Integer.parseInt(tdList.get(2).asText()), tdList.get(3).asText(), tdList.get(4).asText(), SS_PROTOCOL, SS_OBFS);

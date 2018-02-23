@@ -1,6 +1,9 @@
 package com.example.ShadowSocksShare.domain;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
@@ -15,11 +18,12 @@ import java.util.Set;
 @Entity
 // @Table(uniqueConstraints = @UniqueConstraint(columnNames = "targetURL"))    // 唯一约束
 @Table(indexes = {@Index(columnList = "targetURL", unique = false)})           // 非唯一约束
-@RequiredArgsConstructor
+
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
+// @RequiredArgsConstructor
+// @NoArgsConstructor
 @EqualsAndHashCode(exclude = {"id"})
 public class ShadowSocksEntity implements Serializable {
 	private static final long serialVersionUID = 8349835505366821722L;
@@ -29,23 +33,30 @@ public class ShadowSocksEntity implements Serializable {
 	private long id;
 
 	@Column
-	@NonNull
+	// @NonNull
 	private String targetURL;    // 目标网站 URL
 
 	@Column
-	@NonNull
+	// @NonNull
 	private String title;    // 网站名
 
 	@Column
-	@NonNull
+	// @NonNull
 	private boolean valid;    // 是否有效
 
 	@Column
 	@Temporal(TemporalType.TIMESTAMP)    // 爬取完成时间
-	@NonNull
+	// @NonNull
 	private Date finishTime;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)   // 级联保存、更新、删除、刷新;延迟加载
 	@JoinColumn(name = "ss_id")                                        // 在 Details 表增加一个外键列来实现一对多的单向关联
 	private Set<ShadowSocksDetailsEntity> shadowSocksSet;           // 一对多，网站 ShadowSocks 信息
+
+	public ShadowSocksEntity(String targetURL, String title, boolean valid, Date finishTime) {
+		this.targetURL = targetURL;
+		this.title = title;
+		this.valid = valid;
+		this.finishTime = finishTime;
+	}
 }

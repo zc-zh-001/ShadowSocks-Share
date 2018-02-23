@@ -17,7 +17,7 @@ public class ShadowSocksCrawlerServiceTest extends BaseTest {
 	private ShadowSocksCrawlerService iShadowCrawlerServiceImpl;    // ishadow
 	@Autowired
 	@Qualifier("doubCrawlerServiceImpl")
-	private ShadowSocksCrawlerService doubCrawlerServiceImpl;                // https://doub.io
+	private ShadowSocksCrawlerService doubCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("freeSS_EasyToUseCrawlerServiceImpl")
 	private ShadowSocksCrawlerService freeSS_EasyToUseCrawlerServiceImpl;                // https://freess.cx/#portfolio-preview
@@ -29,16 +29,16 @@ public class ShadowSocksCrawlerServiceTest extends BaseTest {
 	private ShadowSocksCrawlerService freeSSRCrawlerServiceImpl;                // https://global.ishadowx.net/
 	@Autowired
 	@Qualifier("free_ssServiceImpl")
-	private ShadowSocksCrawlerService free_ssServiceImpl;                // https://free-ss.site/
+	private ShadowSocksCrawlerService free_ssServiceImpl;
 	@Autowired
 	@Qualifier("ssrBlueCrawlerServiceImpl")
-	private ShadowSocksCrawlerService ssrBlueCrawlerServiceImpl;                // http://www.ssr.blue
+	private ShadowSocksCrawlerService ssrBlueCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("free_yitianjianssCrawlerServiceImpl")
-	private ShadowSocksCrawlerService free_yitianjianssCrawlerServiceImpl;                // http://www.ssr.blue
+	private ShadowSocksCrawlerService free_yitianjianssCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("promPHPCrawlerServiceImpl")
-	private ShadowSocksCrawlerService promPHPCrawlerServiceImpl;                // https://prom-php.herokuapp.com/cloudfra_ssr.txt
+	private ShadowSocksCrawlerService promPHPCrawlerServiceImpl;
 
 	@Test
 	public void parseURL() throws IOException, NotFoundException {
@@ -47,24 +47,35 @@ public class ShadowSocksCrawlerServiceTest extends BaseTest {
 	}
 
 
+	// https://doub.io
 	@Test
 	public void testDoubCrawlerService() {
 		ShadowSocksEntity entity = doubCrawlerServiceImpl.getShadowSocks();
 		log.debug("========>{}", entity);
 	}
 
+	// https://free-ss.site/
 	@Test
 	public void testFree_ssService() {
 		ShadowSocksEntity entity = free_ssServiceImpl.getShadowSocks();
 		log.debug("========>{}", entity);
 	}
 
+	// https://free.yitianjianss.com/
 	@Test
 	public void testFree_yitianjianssCrawlerService() {
 		ShadowSocksEntity entity = free_yitianjianssCrawlerServiceImpl.getShadowSocks();
 		log.debug("========>{}", entity);
 	}
 
+	// https://www.52ssr.cn/
+	@Test
+	public void testSsrBlueCrawlerService() {
+		ShadowSocksEntity entity = ssrBlueCrawlerServiceImpl.getShadowSocks();
+		log.debug("========>{}", entity);
+	}
+
+	// https://prom-php.herokuapp.com/cloudfra_ssr.txt
 	@Test
 	public void testPromPHPCrawlerService() {
 		ShadowSocksEntity entity = promPHPCrawlerServiceImpl.getShadowSocks();
