@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <title th:text="#{app.title}"></title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"/>
+    <!-- Font Awesome -->
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+
+    <!-- 自定义 css -->
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fa fa-paper-plane-o fa-1x fa-flip-horizontal" aria-hidden="true"></i>
+        </a>
+        <!-- 屏幕缩小后的导航按钮 -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbars01"
+                aria-controls="navbars01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbars01">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">首页<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">SSR 订阅</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdown01">
+                        <a class="dropdown-item" th:href="@{/subscribe(valid=1)}" target="_blank">有效 SSR 订阅</a>
+                        <a class="dropdown-item" th:href="@{/subscribe(valid=0)}" target="_blank">全部 SSR 订阅</a>
+                        <a class="dropdown-item" th:href="@{/subscribeJson}" target="_blank">随机 JSON 订阅</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown" th:unless="${#lists.isEmpty(ssrList)}">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown02" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">爬取列表</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdown02">
+                        <a class="dropdown-item" th:href="${ssr.targetURL}" target="_blank"
+                           th:each="ssr,iterStat : ${ssrList}">
+                            <span class="badge badge-primary">
+                                <th:block th:if="${ssr.valid}">
+                                    状态：<i class="fa fa-check-circle" aria-hidden="true">&nbsp; </i>
+                                </th:block>
+                                <th:block th:unless="${ssr.valid}">
+                                    状态：<i class="fa fa-times-circle" aria-hidden="true">&nbsp; </i>
+                                </th:block>
+                            </span>
+                            <span class="badge badge-info">
+                                账号数量：<th:block th:text="${#lists.size(ssr.shadowSocksSet)}"></th:block>
+                            </span>
+                            <span class="badge badge-warning">
+                                <th:block th:text="${ssr.targetURL}"></th:block>
+                            </span>
+
+                            <!--<span class="badge badge-pill badge-info">账号数量：<th:block th:text="${#lists.size(ssr.shadowSocksSet)}"></th:block></span>-->
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/zc-zh-001/ShadowSocks-Share/blob/master/README.md"
+                       target="_blank">关于</a>
+                </li>
+            </ul>
+            <!--<form class="form-inline my-2 my-md-0">
+                <input class="form-control" type="text" placeholder="Search" aria-label="Search"/>
+            </form>-->
+            <!--<a class="github-button" href="https://github.com/zc-zh-001/ShadowSocks-Share/subscription"
+               data-icon="octicon-eye" aria-label="Watch zc-zh-001/ShadowSocks-Share on GitHub">Watch</a>&nbsp;&nbsp;
+            <a class="github-button" href="https://github.com/zc-zh-001/ShadowSocks-Share" data-icon="octicon-star"
+               aria-label="Star zc-zh-001/ShadowSocks-Share on GitHub">Star</a>&nbsp;&nbsp;
+            <a class="github-button" href="https://github.com/zc-zh-001/ShadowSocks-Share/fork"
+               data-icon="octicon-repo-forked" aria-label="Fork zc-zh-001/ShadowSocks-Share on GitHub">Fork</a>-->
+        </div>
+    </div>
+</nav>
+
+<main role="main">
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1 class="jumbotron-heading">SSR 免费账号共享</h1>
+            <p class="lead text-muted">
+                本项目不具备代理及账号管理能力。只负责汇集目标站点信息，便于大家查看、订阅。<br/>
+                账号来之不易，请支持源站点。
+                <a href="https://github.com/zc-zh-001/ShadowSocks-Share" target="_blank">
+                    查看项目
+                </a>
+            </p>
+            <!--<p>
+                <a href="#" class="btn btn-primary my-2">查看项目 &raquo;</a>
+                <a href="#" class="btn btn-secondary my-2">使用帮助 &raquo;</a>
+            </p>-->
+        </div>
+    </section>
+
+    <div class="container">
+        <!--<div class="row">
+            <th:block th:each="ssr,iterStat : ${ssrList}">
+                <div class="col-md-4">
+                    <h2 th:text="${'网站 ' + (iterStat.index + 1)}"></h2>
+                    <p th:text="${'地址：' + ssr.targetURL}"></p>
+                    <p th:text="${'网站：' + ssr.title}"></p>
+                    <p th:text="${'是否有效：' + ssr.valid}"></p>
+                    <p th:text="${'爬取时间：' + ssr.finishTime}"></p>
+                    <p><a class="btn btn-secondary" href="#" role="button">二维码 &raquo;</a></p>
+                </div>
+            </th:block>
+        </div>-->
+
+        <div class="row">
+            <div class="col-md-4 col-sm-6" th:each="ssrd,iterStat : ${ssrdList}">
+                <div class="card mb-4 box-shadow">
+                    <!--<div class="card-header">
+                        <span class="badge" th:text="${ssrd.valid ? '有效' : '无效'}"
+                              th:classappend="${ssrd.valid ? 'badge-success' : 'badge-danger'}">
+                        </span>
+                    </div>-->
+                    <!--<img class="card-img-top" th:src="@{/createQRCode(width=350,height=350,text=${ssrd.link})}"/>-->
+                    <div class="card-body">
+                        <!--<h4 class="card-title">Card title</h4>-->
+                        <div class="card-text">
+                            <dl class="row" th:title="${ssrd.remarks}">
+                                <dt class="col-md-3 col-sm-4">状态</dt>
+                                <dd class="col-md-9 col-sm-8">
+                                    <span th:text="${(iterStat.index + 1) + '.&#160;&#160;' + (ssrd.valid ? '有效' : '无效') + '&#160;&#160;' + #dates.format(ssrd.validTime, 'MM/dd HH:mm')}"
+                                          th:classappend="${ssrd.valid ? 'badge badge-success' : 'badge badge-danger'}">
+                                    </span>
+                                </dd>
+                                <dt class="col-md-3 col-sm-4">地址</dt>
+                                <dd class="col-md-9 col-sm-8">
+                                    <th:block th:text="${ssrd.server}"/>
+                                </dd>
+                                <dt class="col-md-3 col-sm-4">端口</dt>
+                                <dd class="col-md-9 col-sm-8">
+                                    <th:block th:text="${ssrd.server_port}"/>
+                                </dd>
+                                <dt class="col-md-3 col-sm-4">密码</dt>
+                                <dd class="col-md-9 col-sm-8">
+                                    <th:block th:text="${ssrd.password}"/>
+                                </dd>
+                                <dt class="col-md-3 col-sm-4">加密</dt>
+                                <dd class="col-md-9 col-sm-8">
+                                    <th:block th:text="${ssrd.method}"/>
+                                </dd>
+                                <dt class="col-md-3 col-sm-4">协议</dt>
+                                <dd class="col-md-9 col-sm-8">
+                                    <th:block th:text="${ssrd.protocol}"/>
+                                </dd>
+                                <dt class="col-md-3 col-sm-4">混淆</dt>
+                                <dd class="col-md-9 col-sm-8">
+                                    <th:block th:text="${ssrd.obfs}"/>
+                                </dd>
+                            </dl>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" class="btn btn-sm btn-secondary" th:attr="data-id=${ssrd.id},data-title=${ssrd.title},data-value=${ssrd.link}"
+                                        onclick="showImg(this)">
+                                    <i class="fa fa-qrcode" aria-hidden="true"></i> &nbsp; 二维码 &nbsp; &raquo;
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary"
+                                        th:attr="data-title=${ssrd.title},data-value=${ssrd.link}"
+                                        onclick="showLink(this)">
+                                    <i class="fa fa-link" aria-hidden="true"></i> &nbsp; 连接 &nbsp; &raquo;
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary"
+                                        th:attr="data-title=${ssrd.title},data-value=${ssrd.jsonStr}"
+                                        onclick="showLink(this)">
+                                    <i class="fa fa-code" aria-hidden="true"></i> &nbsp; JSON &nbsp; &raquo;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="card-footer"></div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /container -->
+</main>
+
+<hr/>
+<footer class="footer">
+    <div class="container">
+        <p class="float-right">
+            <a href="#"><i class="fa fa-arrow-up" aria-hidden="true"></i>&nbsp;返回顶部</a>
+        </p>
+        <p class="text-muted">&copy; 2017 xxx, Inc. 免费、开源的 SSR 账号爬虫</p>
+    </div>
+</footer>
+
+
+<!-- 二维码图片 -->
+<div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="二维码" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+                        <div class="col-md-12">
+                            <div class="text-center">
+                                <img id="img" class="img-fluid"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary">复制连接</button>
+            </div>-->
+        </div>
+    </div>
+</div>
+
+<!-- link、json -->
+<div class="modal fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="二维码" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle2"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <pre id="modalBody"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<!--<script src="https://cdn.bootcss.com/holder/2.9.4/holder.min.js"></script>-->
+<!--<script src="https://buttons.github.io/buttons.js"></script>-->
+<script th:src="@{/js/common.js}"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    //<![CDATA[
+
+    // 显示二维码
+    function showImg(obj) {
+        // console.log(link);
+        $('#modalTitle').text($(obj).data('title'));
+        $('#img').attr('src', '/createQRCode?width=350&height=350&id=' + $(obj).data('id') + '&text=' + $(obj).attr('data-value'));
+        $('#qrModal').modal('show');
+    }
+
+    // 显示 link、json
+    function showLink(obj) {
+        // console.log($(obj).data('json'));
+        $('#modalTitle2').text($(obj).data('title'));
+        $('#modalBody').text($(obj).attr('data-value'));
+        $('#linkModal').modal('show');
+    }
+
+    //]]>
+</script>
+</body>
+</html>

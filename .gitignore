@@ -1,0 +1,18 @@
+# 自定义
+
+# 系统文件
+/target
+/.settings
+/.classpath
+/.project
+/.idea
+/.mvn
+/ShadowSocks-Share.iml
+/catalina.base_IS_UNDEFINED
+
+# findbugs 文件
+#/findbugs-exclude-filter.xml
+
+# Jrebel 文件
+/src/main/resources/rebel.xml
+/src/main/resources/rebel-remote.xml
