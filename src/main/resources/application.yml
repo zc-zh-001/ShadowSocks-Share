@@ -15,7 +15,7 @@ banner.charset: UTF-8
 spring:
   # profiles
   profiles:
-    active: dev
+    active: prod
 
   # Spring 数据库
   datasource:

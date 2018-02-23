@@ -29,7 +29,7 @@ public class ApplicationStartupListener {
 	 * 系统启动 监听事件
 	 */
 	@Async
-	// @EventListener
+	@EventListener
 	public void handleOrderStateChange(ContextRefreshedEvent contextRefreshedEvent) {
 		crawlerSet.parallelStream()/*.filter((service) -> !(service instanceof InitService))*/.forEach((service) -> shadowSocksSerivce.crawlerAndSave(service));
 	}
