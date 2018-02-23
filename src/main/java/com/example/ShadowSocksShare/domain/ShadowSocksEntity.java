@@ -1,9 +1,6 @@
 package com.example.ShadowSocksShare.domain;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
@@ -23,7 +20,7 @@ import java.util.Set;
 @Setter
 @ToString
 // @RequiredArgsConstructor
-// @NoArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(exclude = {"id"})
 public class ShadowSocksEntity implements Serializable {
 	private static final long serialVersionUID = 8349835505366821722L;

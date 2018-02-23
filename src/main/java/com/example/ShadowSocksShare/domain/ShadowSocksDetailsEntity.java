@@ -2,10 +2,7 @@ package com.example.ShadowSocksShare.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.persistence.*;
@@ -27,7 +24,7 @@ import java.util.Map;
 @Setter
 @ToString
 // @RequiredArgsConstructor
-// @NoArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(exclude = {"id", "remarks", "group"})
 public class ShadowSocksDetailsEntity implements Serializable {
 	// SSR 连接 分隔符
