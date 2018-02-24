@@ -15,7 +15,7 @@
 
 ### Windows
 
-1. [下载](https://github.com/shadowsocksr-backup/shadowsocksr-csharp/releases)客户端，安装、启动
+1. [下载](https://github.com/shadowsocksr-backup/shadowsocksr-csharp/releases) 客户端，安装、启动
 1. 鼠标右键客户端任务栏图标
 1. 服务器订阅 -> SSR 服务器订阅设置
 1. 添加订阅地址 -> 确定
@@ -23,7 +23,7 @@
 
 ### Android
 
-1. [下载](https://github.com/shadowsocksrr/shadowsocksr-android/releases)客户端，安装、启动
+1. [下载](https://github.com/shadowsocksrr/shadowsocksr-android/releases) 客户端，安装、启动
 1. 添加订阅地址
 1. 确定并升级
 
