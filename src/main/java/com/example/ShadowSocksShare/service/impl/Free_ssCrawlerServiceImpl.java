@@ -28,7 +28,7 @@ import java.util.Set;
  */
 @Slf4j
 @Service
-public class Free_ssServiceImpl extends ShadowSocksCrawlerService {
+public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	// 目标网站 URL
 	private static final String TARGET_URL = "https://free-ss.site/";
 	// 访问目标网站，是否启动代理
@@ -63,7 +63,7 @@ public class Free_ssServiceImpl extends ShadowSocksCrawlerService {
 			webClient.setJavaScriptTimeout(10 * 1000);                                // 设置 JS 执行的超时时间
 			webClient.getOptions().setUseInsecureSSL(true);                            // 忽略 SSL 认证
 			webClient.getOptions().setCssEnabled(false);                            // 禁用 CSS，可避免自动二次请求 CSS 进行渲染
-			webClient.getOptions().setThrowExceptionOnScriptError(false);        //运行错误时，不抛出异常
+			webClient.getOptions().setThrowExceptionOnScriptError(false);        // 运行错误时，不抛出异常
 			webClient.getOptions().setTimeout(TIME_OUT);                            // 连接超时时间。如果为 0，则无限期等待
 			webClient.setAjaxController(new NicelyResynchronizingAjaxController());    // 设置 Ajax 异步
 			webClient.getCookieManager().setCookiesEnabled(true);                    // 开启 cookie 管理
@@ -72,7 +72,7 @@ public class Free_ssServiceImpl extends ShadowSocksCrawlerService {
 
 			// 模拟浏览器打开一个目标网址
 			HtmlPage htmlPage = webClient.getPage(getTargetURL());
-			webClient.waitForBackgroundJavaScript(6 * 1000); // 等待 JS 执行时间
+			webClient.waitForBackgroundJavaScript(5 * 1000); // 等待 JS 执行时间
 
 			// 提交：1. 添加一个 submit；2. 添加到 form；3. 点击按钮
 			DomElement button = htmlPage.createElement("button");
@@ -82,19 +82,19 @@ public class Free_ssServiceImpl extends ShadowSocksCrawlerService {
 			form.appendChild(button);
 
 			HtmlPage page = button.click();
-			webClient.waitForBackgroundJavaScript(10 * 1000); // 等待 JS 执行时间
+			int aggregateJobCount = webClient.waitForBackgroundJavaScript(5 * 1000); // 等待 JS 执行时间
 
 			// String ssListJson = page.getWebResponse().getContentAsString();
 			// log.debug("========= > ssListJson:{}", page.asXml());
 
 			// 2. 解析 json 生成 ShadowSocksDetailsEntity
 			DomNodeList<DomNode> trList = page.querySelectorAll("table tbody tr");
-			// log.debug("trList:{}", trList);
+			log.debug("Aggregate Job Count:{}\nDomNodeList<DomNode> size : {}\n{}", aggregateJobCount, trList.size(), trList);
 
 			Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
 			for (int i = 0; i < trList.size(); i++) {
 				DomNode tr = trList.get(i);
-				// log.debug("===============>{}", tr.asText());
+				log.debug("DomNode index : {}\n{}", i, tr.asText());
 				DomNodeList<DomNode> tdList = tr.querySelectorAll("td");
 				if (tdList.size() > 4 && StringUtils.isNotBlank(tdList.get(1).asText()) && StringUtils.isNumeric(tdList.get(2).asText()) && StringUtils.isNotBlank(tdList.get(3).asText()) && StringUtils.isNotBlank(tdList.get(4).asText())) {
 					ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(tdList.get(1).asText(), Integer.parseInt(tdList.get(2).asText()), tdList.get(3).asText(), tdList.get(4).asText(), SS_PROTOCOL, SS_OBFS);
@@ -112,7 +112,7 @@ public class Free_ssServiceImpl extends ShadowSocksCrawlerService {
 					// 无论是否可用都入库
 					set.add(ss);
 
-					log.debug("*************** 第 {} 条 ***************{}{}", i + 1, System.lineSeparator(), ss);
+					log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
 				}
 			}
 

@@ -41,8 +41,8 @@ public class ShadowSocksTasks {
 	@Qualifier("freeSSRCrawlerServiceImpl")
 	private ShadowSocksCrawlerService freeSSRCrawlerServiceImpl;
 	@Autowired
-	@Qualifier("free_ssServiceImpl")
-	private ShadowSocksCrawlerService free_ssServiceImpl;
+	@Qualifier("free_ssCrawlerServiceImpl")
+	private ShadowSocksCrawlerService free_ssCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("ssrBlueCrawlerServiceImpl")
 	private ShadowSocksCrawlerService ssrBlueCrawlerServiceImpl;
@@ -87,7 +87,7 @@ public class ShadowSocksTasks {
 	// https://free-ss.site/
 	@Scheduled(cron = "0 10 0/6 * * ?")
 	public void free_ssCrawler() {
-		shadowSocksSerivce.crawlerAndSave(free_ssServiceImpl);
+		shadowSocksSerivce.crawlerAndSave(free_ssCrawlerServiceImpl);
 	}
 
 	// https://www.52ssr.cn/

@@ -28,8 +28,8 @@ public class ShadowSocksCrawlerServiceTest extends BaseTest {
 	@Qualifier("freeSSRCrawlerServiceImpl")
 	private ShadowSocksCrawlerService freeSSRCrawlerServiceImpl;                // https://global.ishadowx.net/
 	@Autowired
-	@Qualifier("free_ssServiceImpl")
-	private ShadowSocksCrawlerService free_ssServiceImpl;
+	@Qualifier("free_ssCrawlerServiceImpl")
+	private ShadowSocksCrawlerService free_ssCrawlerServiceImpl;
 	@Autowired
 	@Qualifier("ssrBlueCrawlerServiceImpl")
 	private ShadowSocksCrawlerService ssrBlueCrawlerServiceImpl;
@@ -56,8 +56,8 @@ public class ShadowSocksCrawlerServiceTest extends BaseTest {
 
 	// https://free-ss.site/
 	@Test
-	public void testFree_ssService() {
-		ShadowSocksEntity entity = free_ssServiceImpl.getShadowSocks();
+	public void testFree_ssCrawlerService() {
+		ShadowSocksEntity entity = free_ssCrawlerServiceImpl.getShadowSocks();
 		log.debug("========>{}", entity);
 	}
 
