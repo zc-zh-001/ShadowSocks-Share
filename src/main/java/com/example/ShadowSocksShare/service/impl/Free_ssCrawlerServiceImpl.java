@@ -7,10 +7,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.ProxyConfig;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -88,38 +85,48 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 			// log.debug("========= > ssListJson:{}", page.asXml());
 
 			// 2. 解析 json 生成 ShadowSocksDetailsEntity
-			DomNodeList<DomNode> trList = page.querySelectorAll("table tbody tr");
-			log.debug("Aggregate Job Count:{}\nDomNodeList<DomNode> size : {}\n{}", aggregateJobCount, trList.size(), trList);
+			DomNodeList<DomNode> tableList = page.querySelectorAll("table");
 
-			Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
-			for (int i = 0; i < trList.size(); i++) {
-				DomNode tr = trList.get(i);
-				log.debug("DomNode index : {}\n{}", i, tr.asText());
-				DomNodeList<DomNode> tdList = tr.querySelectorAll("td");
-				if (tdList.size() > 4 && StringUtils.isNotBlank(tdList.get(1).asText()) && StringUtils.isNumeric(tdList.get(2).asText()) && StringUtils.isNotBlank(tdList.get(3).asText()) && StringUtils.isNotBlank(tdList.get(4).asText())) {
-					ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(tdList.get(1).asText(), Integer.parseInt(tdList.get(2).asText()), tdList.get(3).asText(), tdList.get(4).asText(), SS_PROTOCOL, SS_OBFS);
-					// 该网站账号默认为可用，不在此验证可用性
-					ss.setValid(true);
-					ss.setValidTime(new Date());
-					ss.setTitle("免费上网账号");
-					ss.setRemarks("https://free-ss.site/");
-					ss.setGroup("ShadowSocks-Share");
+			for (DomNode _table : tableList) {
+				if (_table instanceof HtmlTable) {
+					HtmlTable table = HtmlTable.class.cast(_table);
+					if (!table.getId().equalsIgnoreCase("tb0f14") && !table.getId().equalsIgnoreCase("tbd225")) {
+						DomNodeList<DomNode> trList = table.querySelectorAll("tr");
 
-					// 测试网络
+						log.debug("Aggregate Job Count:{}\nDomNodeList<DomNode> size : {}\n{}", aggregateJobCount, trList.size(), trList);
+
+						Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
+						for (int i = 0; i < trList.size(); i++) {
+							DomNode tr = trList.get(i);
+							log.debug("DomNode index : {}\n{}", i, tr.asText());
+							DomNodeList<DomNode> tdList = tr.querySelectorAll("td");
+							if (tdList.size() > 4 && StringUtils.isNotBlank(tdList.get(1).asText()) && StringUtils.isNumeric(tdList.get(2).asText()) && StringUtils.isNotBlank(tdList.get(3).asText()) && StringUtils.isNotBlank(tdList.get(4).asText())) {
+								ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(tdList.get(1).asText(), Integer.parseInt(tdList.get(2).asText()), tdList.get(3).asText(), tdList.get(4).asText(), SS_PROTOCOL, SS_OBFS);
+								// 该网站账号默认为可用，不在此验证可用性
+								ss.setValid(true);
+								ss.setValidTime(new Date());
+								ss.setTitle("免费上网账号");
+								ss.setRemarks("https://free-ss.site/");
+								ss.setGroup("ShadowSocks-Share");
+
+								// 测试网络
 					/*if (isReachable(ss))
 						ss.setValid(true);*/
 
-					// 无论是否可用都入库
-					set.add(ss);
+								// 无论是否可用都入库
+								set.add(ss);
 
-					log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
+								log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
+							}
+						}
+
+						// 3. 生成 ShadowSocksEntity
+						ShadowSocksEntity entity = new ShadowSocksEntity("https://free-ss.site/", "免费上网账号", true, new Date());
+						entity.setShadowSocksSet(set);
+						return entity;
+					}
 				}
 			}
-
-			// 3. 生成 ShadowSocksEntity
-			ShadowSocksEntity entity = new ShadowSocksEntity("https://free-ss.site/", "免费上网账号", true, new Date());
-			entity.setShadowSocksSet(set);
-			return entity;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

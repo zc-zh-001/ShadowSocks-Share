@@ -85,7 +85,7 @@ public class ShadowSocksTasks {
 	}
 
 	// https://free-ss.site/
-	@Scheduled(cron = "0 10 0/6 * * ?")
+	@Scheduled(cron = "0 10 0/3 * * ?")
 	public void free_ssCrawler() {
 		shadowSocksSerivce.crawlerAndSave(free_ssCrawlerServiceImpl);
 	}
