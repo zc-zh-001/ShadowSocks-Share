@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT -Dfile.encoding=UTF-8 -jar target/ShadowSocks-Share-0.0.1-SNAPSHOT.war
