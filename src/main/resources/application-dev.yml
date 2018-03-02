@@ -7,7 +7,7 @@ proxy:
 
   # 访问 free-ss 时所用代理
   free-ss:
-    enable: true
+    enable: false
     host: 113.12.72.24
     port: 3128
     socks: false

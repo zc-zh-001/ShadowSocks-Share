@@ -5,6 +5,7 @@ import com.example.ShadowSocksShare.domain.ShadowSocksEntity;
 import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.anthavio.phanbedder.Phanbedder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,13 +71,13 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	private Environment env;
 
 	public ShadowSocksEntity getShadowSocks() {
-		String phantomjsPath = "";
-		try {
+		String phantomjsPath = Phanbedder.unpack().getAbsolutePath();
+		/*try {
 			if (ArrayUtils.contains(env.getActiveProfiles(), "prod")) {
 				// 生产环境
 				File phantomjsFile = new File(SystemUtils.getJavaIoTmpDir().getAbsolutePath(), "phantomjs");
 				if (!phantomjsFile.exists()) {
-					FileUtils.copyURLToFile(new URL("https://github.com/ariya/phantomjs/releases/download/2.1.3/phantomjs"), phantomjsFile);
+					FileUtils.copyURLToFile(new URL("https://github.com/ariya/phantomjs/releases/download/2.1.3/phantomjs"), phantomjsFile, 60 * 1000, 30 * 60 * 1000);
 				}
 				if (!phantomjsFile.canExecute())
 					phantomjsFile.setExecutable(true);
@@ -87,10 +88,9 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
-		}
+		}*/
 
 		log.debug("File Path：{}", phantomjsPath);
-
 
 		// 设置必要参数
 		DesiredCapabilities capability = DesiredCapabilities.chrome();
@@ -120,8 +120,7 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 			capability.setCapability(CapabilityType.PROXY, proxy);
 		}
 
-
-		// WebDriver driver = new RemoteWebDriver(new URL(TARGET_URL), capability);
+		// WebDriver driver = new RemoteWebDriver(new URL(serverUrl), capability);
 		WebDriver driver = null;
 		try {
 			driver = new PhantomJSDriver(capability);
@@ -179,8 +178,10 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		} finally {
-			if (driver != null)
-				driver.close();
+			if (driver != null) {
+				driver.quit();
+				// driver.close();
+			}
 		}
 		return new ShadowSocksEntity(TARGET_URL, "免费上网账号", false, new Date());
 	}

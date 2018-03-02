@@ -14,6 +14,7 @@ import java.util.TimeZone;
 // @EnableCaching
 public class Application {
 
+	// java -jar -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -Dspring.profiles.active=prod ShadowSocks-Share-0.0.1-SNAPSHOT.jar --server.port=8000
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
