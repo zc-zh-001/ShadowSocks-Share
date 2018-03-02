@@ -98,60 +98,65 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 
 
 		// WebDriver driver = new RemoteWebDriver(new URL(TARGET_URL), capability);
-		WebDriver driver = new PhantomJSDriver(capability);
-		driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
-		driver.get(TARGET_URL);
-
+		WebDriver driver = null;
 		try {
+			driver = new PhantomJSDriver(capability);
+			driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
+			driver.get(TARGET_URL);
+
 			TimeUnit.SECONDS.sleep(5);
-		} catch (InterruptedException e) {
-			log.error(e.getMessage());
-		}
 
-		if (waitForAjax(driver)) {
-			List<WebElement> divList = driver.findElements(By.xpath("//div[contains(@class, 'dataTables_wrapper')]"));
-			for (WebElement dev : divList) {
-				// log.debug("height =================>{}", dev.getSize().height);
-				// log.debug("isDisplayed =================>{}", dev.isDisplayed());
-				// log.debug("DIV innerHTML =================>{}", dev.getAttribute("innerHTML"));
+			if (waitForAjax(driver)) {
+				List<WebElement> divList = driver.findElements(By.xpath("//div[contains(@class, 'dataTables_wrapper')]"));
+				for (WebElement dev : divList) {
+					// log.debug("height =================>{}", dev.getSize().height);
+					// log.debug("isDisplayed =================>{}", dev.isDisplayed());
+					// log.debug("DIV innerHTML =================>{}", dev.getAttribute("innerHTML"));
 
-				if (dev.isDisplayed()) {
-					List<WebElement> trList = dev.findElements(By.xpath("./table/tbody/tr"));
+					if (dev.isDisplayed()) {
+						List<WebElement> trList = dev.findElements(By.xpath("./table/tbody/tr"));
 
-					Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
-					for (WebElement tr : trList) {
-						// log.debug("TR innerHTML =================>{}", tr.getAttribute("innerHTML"));
+						Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
+						for (WebElement tr : trList) {
+							// log.debug("TR innerHTML =================>{}", tr.getAttribute("innerHTML"));
 
-						String server = tr.findElement(By.xpath("./td[2]")).getText();
-						String server_port = tr.findElement(By.xpath("./td[3]")).getText();
-						String password = tr.findElement(By.xpath("./td[4]")).getText();
-						String method = tr.findElement(By.xpath("./td[5]")).getText();
+							String server = tr.findElement(By.xpath("./td[2]")).getText();
+							String server_port = tr.findElement(By.xpath("./td[3]")).getText();
+							String password = tr.findElement(By.xpath("./td[4]")).getText();
+							String method = tr.findElement(By.xpath("./td[5]")).getText();
 
-						if (StringUtils.isNotBlank(server) && StringUtils.isNumeric(server_port) && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(method)) {
-							ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(server, Integer.parseInt(server_port), password, method, SS_PROTOCOL, SS_OBFS);
-							// 该网站账号默认为可用，不在此验证可用性
-							ss.setValid(true);
-							ss.setValidTime(new Date());
-							ss.setTitle("免费上网账号");
-							ss.setRemarks("https://free-ss.site/");
-							ss.setGroup("ShadowSocks-Share");
-
-							// 测试网络
-							if (isReachable(ss))
+							if (StringUtils.isNotBlank(server) && StringUtils.isNumeric(server_port) && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(method)) {
+								ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(server, Integer.parseInt(server_port), password, method, SS_PROTOCOL, SS_OBFS);
+								// 该网站账号默认为可用，不在此验证可用性
 								ss.setValid(true);
+								ss.setValidTime(new Date());
+								ss.setTitle("免费上网账号");
+								ss.setRemarks("https://free-ss.site/");
+								ss.setGroup("ShadowSocks-Share");
 
-							// 无论是否可用都入库
-							set.add(ss);
+								// 测试网络
+								if (isReachable(ss))
+									ss.setValid(true);
 
-							log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
+								// 无论是否可用都入库
+								set.add(ss);
+
+								log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
+							}
 						}
-					}
 
-					// 3. 生成 ShadowSocksEntity
-					ShadowSocksEntity entity = new ShadowSocksEntity(TARGET_URL, driver.getTitle(), true, new Date());
-					entity.setShadowSocksSet(set);
+						// 3. 生成 ShadowSocksEntity
+						ShadowSocksEntity entity = new ShadowSocksEntity(TARGET_URL, driver.getTitle(), true, new Date());
+						entity.setShadowSocksSet(set);
+						return entity;
+					}
 				}
 			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			if (driver != null)
+				driver.close();
 		}
 		return new ShadowSocksEntity(TARGET_URL, "免费上网账号", false, new Date());
 	}
