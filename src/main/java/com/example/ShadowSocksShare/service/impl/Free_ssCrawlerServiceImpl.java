@@ -6,10 +6,7 @@ import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.anthavio.phanbedder.Phanbedder;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.*;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -24,9 +21,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -71,58 +65,58 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	private Environment env;
 
 	public ShadowSocksEntity getShadowSocks() {
-		String phantomjsPath = Phanbedder.unpack().getAbsolutePath();
-		/*try {
-			if (ArrayUtils.contains(env.getActiveProfiles(), "prod")) {
-				// 生产环境
-				File phantomjsFile = new File(SystemUtils.getJavaIoTmpDir().getAbsolutePath(), "phantomjs");
-				if (!phantomjsFile.exists()) {
-					FileUtils.copyURLToFile(new URL("https://github.com/ariya/phantomjs/releases/download/2.1.3/phantomjs"), phantomjsFile, 60 * 1000, 30 * 60 * 1000);
-				}
-				if (!phantomjsFile.canExecute())
-					phantomjsFile.setExecutable(true);
-				phantomjsPath = phantomjsFile.getAbsolutePath();
-			} else {
-				// 开发环境
-				phantomjsPath = resourceLoader.getResource("classpath:lib/phantomjs.exe").getFile().getAbsolutePath();
-			}
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}*/
-
-		log.debug("File Path：{}", phantomjsPath);
-
-		// 设置必要参数
-		DesiredCapabilities capability = DesiredCapabilities.chrome();
-		// userAgent
-		capability.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "userAgent", userAgent);
-		// SSL 证书支持
-		capability.setCapability("acceptSslCerts", true);
-		// 截屏支持
-		// capability.setCapability("takesScreenshot", false);
-		// CSS 搜索支持
-		capability.setCapability("cssSelectorsEnabled", true);
-		// JS 支持
-		capability.setJavascriptEnabled(true);
-		// 驱动支持
-		capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomjsPath);
-
-		// 设置代理
-		if (ssProxyEnable) {
-			String proxyServer = ssProxyHost + ":" + ssProxyPort;
-			Proxy proxy = new Proxy();
-			// proxy.setAutodetect(true).setProxyType(Proxy.ProxyType.MANUAL);
-			if (ssSocks) {
-				proxy.setSocksProxy(proxyServer);
-			} else {
-				proxy.setHttpProxy(proxyServer).setFtpProxy(proxyServer).setSslProxy(proxyServer);
-			}
-			capability.setCapability(CapabilityType.PROXY, proxy);
-		}
-
 		// WebDriver driver = new RemoteWebDriver(new URL(serverUrl), capability);
 		WebDriver driver = null;
 		try {
+			String phantomjsPath = Phanbedder.unpack().getAbsolutePath();
+			/*try {
+				if (ArrayUtils.contains(env.getActiveProfiles(), "prod")) {
+					// 生产环境
+					File phantomjsFile = new File(SystemUtils.getJavaIoTmpDir().getAbsolutePath(), "phantomjs");
+					if (!phantomjsFile.exists()) {
+						FileUtils.copyURLToFile(new URL("https://github.com/ariya/phantomjs/releases/download/2.1.3/phantomjs"), phantomjsFile, 60 * 1000, 30 * 60 * 1000);
+					}
+					if (!phantomjsFile.canExecute())
+						phantomjsFile.setExecutable(true);
+					phantomjsPath = phantomjsFile.getAbsolutePath();
+				} else {
+					// 开发环境
+					phantomjsPath = resourceLoader.getResource("classpath:lib/phantomjs.exe").getFile().getAbsolutePath();
+				}
+			} catch (IOException e) {
+				log.error(e.getMessage(), e);
+			}*/
+
+			log.debug("File Path：{}", phantomjsPath);
+
+			// 设置必要参数
+			DesiredCapabilities capability = DesiredCapabilities.chrome();
+			// userAgent
+			capability.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "userAgent", userAgent);
+			// SSL 证书支持
+			capability.setCapability("acceptSslCerts", true);
+			// 截屏支持
+			// capability.setCapability("takesScreenshot", false);
+			// CSS 搜索支持
+			capability.setCapability("cssSelectorsEnabled", true);
+			// JS 支持
+			capability.setJavascriptEnabled(true);
+			// 驱动支持
+			capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomjsPath);
+
+			// 设置代理
+			if (ssProxyEnable) {
+				String proxyServer = ssProxyHost + ":" + ssProxyPort;
+				Proxy proxy = new Proxy();
+				// proxy.setAutodetect(true).setProxyType(Proxy.ProxyType.MANUAL);
+				if (ssSocks) {
+					proxy.setSocksProxy(proxyServer);
+				} else {
+					proxy.setHttpProxy(proxyServer).setFtpProxy(proxyServer).setSslProxy(proxyServer);
+				}
+				capability.setCapability(CapabilityType.PROXY, proxy);
+			}
+
 			driver = new PhantomJSDriver(capability);
 			driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
 			driver.get(TARGET_URL);
