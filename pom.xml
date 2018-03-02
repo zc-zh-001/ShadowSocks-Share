@@ -6,7 +6,7 @@
     <groupId>com.example</groupId>
     <artifactId>ShadowSocks-Share</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>ShadowSocks-Share</name>
     <description>ShadowSocks-Share</description>
@@ -156,13 +156,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
-        </dependency>
-
-        <!-- 内嵌的servlet容器不能干扰war包将部署的servlet容器 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
