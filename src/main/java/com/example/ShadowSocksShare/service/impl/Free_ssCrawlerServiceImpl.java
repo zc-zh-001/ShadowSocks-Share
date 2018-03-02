@@ -3,22 +3,29 @@ package com.example.ShadowSocksShare.service.impl;
 import com.example.ShadowSocksShare.domain.ShadowSocksDetailsEntity;
 import com.example.ShadowSocksShare.domain.ShadowSocksEntity;
 import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.ProxyConfig;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
+import org.openqa.selenium.*;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * https://free-ss.site/
@@ -28,6 +35,8 @@ import java.util.Set;
 public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	// 目标网站 URL
 	private static final String TARGET_URL = "https://free-ss.site/";
+	// userAgent
+	private static final String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36";
 	// 访问目标网站，是否启动代理
 	@Value("${proxy.enable}")
 	@Getter
@@ -40,7 +49,6 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	@Getter
 	@Value("${proxy.port}")
 	private int proxyPort;
-
 	@Value("${proxy.free-ss.enable}")
 	private boolean ssProxyEnable;
 	@Value("${proxy.free-ss.host}")
@@ -50,87 +58,102 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	@Value("${proxy.free-ss.socks}")
 	private boolean ssSocks;
 
+	@Value("${webDriver.phantomJSPath}")
+	private String phantomJSPath;
+	@Autowired
+	private ResourceLoader resourceLoader;
+
 	public ShadowSocksEntity getShadowSocks() {
-		try (WebClient webClient = new WebClient(BrowserVersion.CHROME)) {
-			// 设置代理
-			if (ssProxyEnable)
-				webClient.getOptions().setProxyConfig(new ProxyConfig(ssProxyHost, ssProxyPort, ssSocks));
-			// 1. 爬取账号
-			webClient.getOptions().setJavaScriptEnabled(true);                        // 启动 JS
-			webClient.setJavaScriptTimeout(10 * 1000);                                // 设置 JS 执行的超时时间
-			webClient.getOptions().setUseInsecureSSL(true);                            // 忽略 SSL 认证
-			webClient.getOptions().setCssEnabled(false);                            // 禁用 CSS，可避免自动二次请求 CSS 进行渲染
-			webClient.getOptions().setThrowExceptionOnScriptError(false);        // 运行错误时，不抛出异常
-			webClient.getOptions().setTimeout(TIME_OUT);                            // 连接超时时间。如果为 0，则无限期等待
-			webClient.setAjaxController(new NicelyResynchronizingAjaxController());    // 设置 Ajax 异步
-			webClient.getCookieManager().setCookiesEnabled(true);                    // 开启 cookie 管理
-
-			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);    // 忽略错误的 Http code
-
-			// 模拟浏览器打开一个目标网址
-			HtmlPage htmlPage = webClient.getPage(getTargetURL());
-			webClient.waitForBackgroundJavaScript(5 * 1000); // 等待 JS 执行时间
-
-			// 提交：1. 添加一个 submit；2. 添加到 form；3. 点击按钮
-			DomElement button = htmlPage.createElement("button");
-			button.setAttribute("type", "submit");
-
-			final DomElement form = htmlPage.getElementById("challenge-form");
-			form.appendChild(button);
-
-			HtmlPage page = button.click();
-			int aggregateJobCount = webClient.waitForBackgroundJavaScript(5 * 1000); // 等待 JS 执行时间
-
-			// String ssListJson = page.getWebResponse().getContentAsString();
-			// log.debug("========= > ssListJson:{}", page.asXml());
-
-			// 2. 解析 json 生成 ShadowSocksDetailsEntity
-			DomNodeList<DomNode> tableList = page.querySelectorAll("table");
-
-			for (DomNode _table : tableList) {
-				if (_table instanceof HtmlTable) {
-					HtmlTable table = HtmlTable.class.cast(_table);
-					if (!table.getId().equalsIgnoreCase("tb0f14") && !table.getId().equalsIgnoreCase("tbd225")) {
-						DomNodeList<DomNode> trList = table.querySelectorAll("tr");
-
-						log.debug("Aggregate Job Count:{}\nDomNodeList<DomNode> size : {}\n{}", aggregateJobCount, trList.size(), trList);
-
-						Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
-						for (int i = 0; i < trList.size(); i++) {
-							DomNode tr = trList.get(i);
-							log.debug("DomNode index : {}\n{}", i, tr.asText());
-							DomNodeList<DomNode> tdList = tr.querySelectorAll("td");
-							if (tdList.size() > 4 && StringUtils.isNotBlank(tdList.get(1).asText()) && StringUtils.isNumeric(tdList.get(2).asText()) && StringUtils.isNotBlank(tdList.get(3).asText()) && StringUtils.isNotBlank(tdList.get(4).asText())) {
-								ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(tdList.get(1).asText(), Integer.parseInt(tdList.get(2).asText()), tdList.get(3).asText(), tdList.get(4).asText(), SS_PROTOCOL, SS_OBFS);
-								// 该网站账号默认为可用，不在此验证可用性
-								ss.setValid(true);
-								ss.setValidTime(new Date());
-								ss.setTitle("免费上网账号");
-								ss.setRemarks("https://free-ss.site/");
-								ss.setGroup("ShadowSocks-Share");
-
-								// 测试网络
-					/*if (isReachable(ss))
-						ss.setValid(true);*/
-
-								// 无论是否可用都入库
-								set.add(ss);
-
-								log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
-							}
-						}
-
-						// 3. 生成 ShadowSocksEntity
-						ShadowSocksEntity entity = new ShadowSocksEntity("https://free-ss.site/", "免费上网账号", true, new Date());
-						entity.setShadowSocksSet(set);
-						return entity;
-					}
-				}
-			}
-		} catch (Exception e) {
+		// 设置必要参数
+		DesiredCapabilities capability = DesiredCapabilities.chrome();
+		// userAgent
+		capability.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "userAgent", userAgent);
+		// SSL 证书支持
+		capability.setCapability("acceptSslCerts", true);
+		// 截屏支持
+		// capability.setCapability("takesScreenshot", false);
+		// CSS 搜索支持
+		capability.setCapability("cssSelectorsEnabled", true);
+		// JS 支持
+		capability.setJavascriptEnabled(true);
+		// 驱动支持
+		try {
+			capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, resourceLoader.getResource(phantomJSPath).getFile().getAbsolutePath());
+		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
-		return new ShadowSocksEntity("https://free-ss.site/", "免费上网账号", false, new Date());
+
+		// 设置代理
+		if (ssProxyEnable) {
+			String proxyServer = ssProxyHost + ":" + ssProxyPort;
+			Proxy proxy = new Proxy();
+			proxy.setAutodetect(true).setProxyType(Proxy.ProxyType.MANUAL);
+			if (ssSocks) {
+				proxy.setSocksProxy(proxyServer);
+			} else {
+				proxy.setHttpProxy(proxyServer).setFtpProxy(proxyServer).setSslProxy(proxyServer);
+			}
+			capability.setCapability(CapabilityType.PROXY, proxy);
+		}
+
+
+		// WebDriver driver = new RemoteWebDriver(new URL(TARGET_URL), capability);
+		WebDriver driver = new PhantomJSDriver(capability);
+		driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
+		driver.get(TARGET_URL);
+
+		try {
+			TimeUnit.SECONDS.sleep(5);
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
+
+		if (waitForAjax(driver)) {
+			List<WebElement> divList = driver.findElements(By.xpath("//div[contains(@class, 'dataTables_wrapper')]"));
+			for (WebElement dev : divList) {
+				// log.debug("height =================>{}", dev.getSize().height);
+				// log.debug("isDisplayed =================>{}", dev.isDisplayed());
+				// log.debug("DIV innerHTML =================>{}", dev.getAttribute("innerHTML"));
+
+				if (dev.isDisplayed()) {
+					List<WebElement> trList = dev.findElements(By.xpath("./table/tbody/tr"));
+
+					Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
+					for (WebElement tr : trList) {
+						// log.debug("TR innerHTML =================>{}", tr.getAttribute("innerHTML"));
+
+						String server = tr.findElement(By.xpath("./td[2]")).getText();
+						String server_port = tr.findElement(By.xpath("./td[3]")).getText();
+						String password = tr.findElement(By.xpath("./td[4]")).getText();
+						String method = tr.findElement(By.xpath("./td[5]")).getText();
+
+						if (StringUtils.isNotBlank(server) && StringUtils.isNumeric(server_port) && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(method)) {
+							ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(server, Integer.parseInt(server_port), password, method, SS_PROTOCOL, SS_OBFS);
+							// 该网站账号默认为可用，不在此验证可用性
+							ss.setValid(true);
+							ss.setValidTime(new Date());
+							ss.setTitle("免费上网账号");
+							ss.setRemarks("https://free-ss.site/");
+							ss.setGroup("ShadowSocks-Share");
+
+							// 测试网络
+							if (isReachable(ss))
+								ss.setValid(true);
+
+							// 无论是否可用都入库
+							set.add(ss);
+
+							log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
+						}
+					}
+
+					// 3. 生成 ShadowSocksEntity
+					ShadowSocksEntity entity = new ShadowSocksEntity(TARGET_URL, driver.getTitle(), true, new Date());
+					entity.setShadowSocksSet(set);
+				}
+			}
+		}
+		return new ShadowSocksEntity(TARGET_URL, "免费上网账号", false, new Date());
 	}
 
 	/**
@@ -147,5 +170,27 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	@Override
 	protected String getTargetURL() {
 		return MessageFormat.format(TARGET_URL, String.valueOf(System.currentTimeMillis()));
+	}
+
+	public boolean waitForAjax(WebDriver driver) {
+		WebDriverWait wait = new WebDriverWait(driver, 30, 500);
+		ExpectedCondition<Boolean> jQueryLoad = new ExpectedCondition<Boolean>() {
+			@Override
+			public Boolean apply(WebDriver driver) {
+				try {
+					return ((Long) ((JavascriptExecutor) driver).executeScript("return jQuery.active") == 0);
+				} catch (Exception e) {
+					return true;
+				}
+			}
+		};
+		ExpectedCondition<Boolean> jsLoad = new ExpectedCondition<Boolean>() {
+			@Override
+			public Boolean apply(WebDriver driver) {
+				return ((JavascriptExecutor) driver).executeScript("return document.readyState")
+						.toString().equals("complete");
+			}
+		};
+		return wait.until(jQueryLoad) && wait.until(jsLoad);
 	}
 }
