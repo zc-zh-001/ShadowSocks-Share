@@ -5,7 +5,9 @@ import com.example.ShadowSocksShare.domain.ShadowSocksEntity;
 import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.*;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -19,7 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -64,6 +68,18 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	private ResourceLoader resourceLoader;
 
 	public ShadowSocksEntity getShadowSocks() {
+		// 下载
+		File phantomjsFile = new File(SystemUtils.getJavaIoTmpDir().getAbsolutePath(), "phantomjs");
+		if (!phantomjsFile.exists()) {
+			try {
+				FileUtils.copyURLToFile(new URL("https://github.com/ariya/phantomjs/releases/download/2.1.3/phantomjs"), phantomjsFile);
+			} catch (IOException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+		log.debug("File Path：{}", phantomjsFile.getAbsolutePath());
+
+
 		// 设置必要参数
 		DesiredCapabilities capability = DesiredCapabilities.chrome();
 		// userAgent
@@ -77,11 +93,7 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 		// JS 支持
 		capability.setJavascriptEnabled(true);
 		// 驱动支持
-		try {
-			capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, resourceLoader.getResource(phantomJSPath).getFile().getAbsolutePath());
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}
+		capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomjsFile.getAbsolutePath()/*resourceLoader.getResource(phantomJSPath).getFile().getAbsolutePath()*/);
 
 		// 设置代理
 		if (ssProxyEnable) {
