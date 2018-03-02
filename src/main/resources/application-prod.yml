@@ -13,11 +13,6 @@ proxy:
     socks: false
 
 
-# 路径
-webDriver:
-  phantomJSPath: classpath:lib/phantomjs
-
-
 #  因 Heroku 应用 30 分钟没有访问会自动休眠，为防止休眠，系统每 20 分钟访问一次该配置地址
 health:
   url: https://shadowsocks-share.herokuapp.com/count

@@ -6,6 +6,7 @@ import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.nodes.Document;
@@ -18,6 +19,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -62,22 +64,30 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	@Value("${proxy.free-ss.socks}")
 	private boolean ssSocks;
 
-	@Value("${webDriver.phantomJSPath}")
-	private String phantomJSPath;
 	@Autowired
 	private ResourceLoader resourceLoader;
+	@Autowired
+	private Environment env;
 
 	public ShadowSocksEntity getShadowSocks() {
-		// 下载
-		File phantomjsFile = new File(SystemUtils.getJavaIoTmpDir().getAbsolutePath(), "phantomjs");
-		if (!phantomjsFile.exists()) {
-			try {
-				FileUtils.copyURLToFile(new URL("https://github.com/ariya/phantomjs/releases/download/2.1.3/phantomjs"), phantomjsFile);
-			} catch (IOException e) {
-				log.error(e.getMessage(), e);
+		String phantomjsPath = "";
+		try {
+			if (ArrayUtils.contains(env.getActiveProfiles(), "prod")) {
+				// 生产环境
+				File phantomjsFile = new File(SystemUtils.getJavaIoTmpDir().getAbsolutePath(), "phantomjs");
+				if (!phantomjsFile.exists()) {
+					FileUtils.copyURLToFile(new URL("https://github.com/ariya/phantomjs/releases/download/2.1.3/phantomjs"), phantomjsFile);
+				}
+				phantomjsPath = phantomjsFile.getAbsolutePath();
+			} else {
+				// 开发环境
+				phantomjsPath = resourceLoader.getResource("classpath:lib/phantomjs.exe").getFile().getAbsolutePath();
 			}
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
 		}
-		log.debug("File Path：{}", phantomjsFile.getAbsolutePath());
+
+		log.debug("File Path：{}", phantomjsPath);
 
 
 		// 设置必要参数
@@ -93,13 +103,13 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 		// JS 支持
 		capability.setJavascriptEnabled(true);
 		// 驱动支持
-		capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomjsFile.getAbsolutePath()/*resourceLoader.getResource(phantomJSPath).getFile().getAbsolutePath()*/);
+		capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomjsPath);
 
 		// 设置代理
 		if (ssProxyEnable) {
 			String proxyServer = ssProxyHost + ":" + ssProxyPort;
 			Proxy proxy = new Proxy();
-			proxy.setAutodetect(true).setProxyType(Proxy.ProxyType.MANUAL);
+			// proxy.setAutodetect(true).setProxyType(Proxy.ProxyType.MANUAL);
 			if (ssSocks) {
 				proxy.setSocksProxy(proxyServer);
 			} else {
