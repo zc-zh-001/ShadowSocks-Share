@@ -78,6 +78,8 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 				if (!phantomjsFile.exists()) {
 					FileUtils.copyURLToFile(new URL("https://github.com/ariya/phantomjs/releases/download/2.1.3/phantomjs"), phantomjsFile);
 				}
+				if (!phantomjsFile.canExecute())
+					phantomjsFile.setExecutable(true);
 				phantomjsPath = phantomjsFile.getAbsolutePath();
 			} else {
 				// 开发环境
