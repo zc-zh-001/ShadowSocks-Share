@@ -31,8 +31,7 @@
         <java.version>1.8</java.version>
         <!-- 自定义 -->
         <commons-codec.version>1.11</commons-codec.version>
-        <htmlunit.version>2.29</htmlunit.version>
-        <selenium.version>3.9.1</selenium.version>
+        <selenium.version>3.10.0</selenium.version>
     </properties>
 
     <dependencies>
@@ -114,11 +113,6 @@
             <artifactId>selenium-support</artifactId>
             <version>${selenium.version}</version>
         </dependency>
-
-        <!--<dependency>
-           <groupId>net.sourceforge.htmlunit</groupId>
-           <artifactId>htmlunit</artifactId>
-       </dependency>-->
 
         <!--<dependency>
             <groupId>com.github.detro.ghostdriver</groupId>

@@ -5,16 +5,18 @@ import com.example.ShadowSocksShare.domain.ShadowSocksEntity;
 import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.nodes.Document;
-import org.openqa.selenium.*;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Proxy;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -65,27 +67,34 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	private Environment env;
 
 	public ShadowSocksEntity getShadowSocks() {
-		// WebDriver driver = new RemoteWebDriver(new URL(serverUrl), capability);
 		WebDriver driver = null;
 		try {
-			// 设置必要参数
-			DesiredCapabilities capability = DesiredCapabilities.chrome();
-			// userAgent
-			capability.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "userAgent", userAgent);
-			// SSL 证书支持
-			capability.setCapability("acceptSslCerts", true);
-			// 截屏支持
-			// capability.setCapability("takesScreenshot", false);
-			// CSS 搜索支持
-			capability.setCapability("cssSelectorsEnabled", true);
-			// JS 支持
-			capability.setJavascriptEnabled(true);
-			// 驱动支持(生产环境不用设置，开发环境读取 exe)
-			if (ArrayUtils.contains(env.getActiveProfiles(), "dev")) {
-				capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, resourceLoader.getResource("classpath:lib/phantomjs.exe").getFile().getAbsolutePath());
+			/*System.setProperty("webdriver.chrome.logfile", "D:\\chromedriver.log");
+			System.setProperty("webdriver.chrome.verboseLogging", "true");*/
+
+			ChromeDriverService service = null;
+
+			if (SystemUtils.IS_OS_WINDOWS) {
+				service = new ChromeDriverService.Builder().usingAnyFreePort()
+						.usingDriverExecutable(resourceLoader.getResource("classpath:lib/chromedriver.exe").getFile())
+						.build();
+			} else {
+				service = new ChromeDriverService.Builder().usingAnyFreePort().build();
 			}
 
-			// 设置代理
+			ChromeOptions options = new ChromeOptions();
+
+			if (SystemUtils.IS_OS_WINDOWS) {
+				options.setBinary("D:\\software\\CentBrowser\\chrome.exe");
+				// options.addArguments("user-data-dir=D:\\software\\CentBrowser\\User Data");
+			} else {
+				options.setBinary(EnvironmentUtils.getProcEnvironment().get("GOOGLE_CHROME_SHIM"));
+				options.addArguments("--headless");
+				options.addArguments("--disable-gpu");
+				options.addArguments("--no-sandbox");
+				options.addArguments("window-size=1200x600");
+			}
+
 			if (ssProxyEnable) {
 				String proxyServer = ssProxyHost + ":" + ssProxyPort;
 				Proxy proxy = new Proxy();
@@ -93,18 +102,21 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 				if (ssSocks) {
 					proxy.setSocksProxy(proxyServer);
 				} else {
-					proxy.setHttpProxy(proxyServer).setFtpProxy(proxyServer).setSslProxy(proxyServer);
+					proxy.setHttpProxy(proxyServer);
 				}
-				capability.setCapability(CapabilityType.PROXY, proxy);
+				options.setCapability(CapabilityType.PROXY, proxy);
 			}
 
-			driver = new PhantomJSDriver(capability);
+			driver = new ChromeDriver(service, options);
 			driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(TIME_OUT, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(TIME_OUT, TimeUnit.SECONDS);
+
 			driver.get(TARGET_URL);
 
-			TimeUnit.SECONDS.sleep(5);
+			TimeUnit.SECONDS.sleep(15);
 
-			if (waitForAjax(driver)) {
+			if (true) {
 				List<WebElement> divList = driver.findElements(By.xpath("//div[contains(@class, 'dataTables_wrapper')]"));
 				for (WebElement dev : divList) {
 					// log.debug("height =================>{}", dev.getSize().height);
@@ -175,27 +187,5 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	@Override
 	protected String getTargetURL() {
 		return MessageFormat.format(TARGET_URL, String.valueOf(System.currentTimeMillis()));
-	}
-
-	public boolean waitForAjax(WebDriver driver) {
-		WebDriverWait wait = new WebDriverWait(driver, 30, 500);
-		ExpectedCondition<Boolean> jQueryLoad = new ExpectedCondition<Boolean>() {
-			@Override
-			public Boolean apply(WebDriver driver) {
-				try {
-					return ((Long) ((JavascriptExecutor) driver).executeScript("return jQuery.active") == 0);
-				} catch (Exception e) {
-					return true;
-				}
-			}
-		};
-		ExpectedCondition<Boolean> jsLoad = new ExpectedCondition<Boolean>() {
-			@Override
-			public Boolean apply(WebDriver driver) {
-				return ((JavascriptExecutor) driver).executeScript("return document.readyState")
-						.toString().equals("complete");
-			}
-		};
-		return wait.until(jQueryLoad) && wait.until(jsLoad);
 	}
 }

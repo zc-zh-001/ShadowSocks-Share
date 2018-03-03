@@ -28,6 +28,9 @@
 
         <logger name="com.example.ShadowSocksShare" level="DEBUG"/>
 
+        <logger name="org.openqa.selenium" level="DEBUG"/>
+        <logger name="org.openqa.selenium" level="DEBUG"/>
+
         <logger name="org.springframework.web" level="INFO"/>
         <logger name="org.jsoup" level="INFO"/>
         <logger name="org.hibernate" level="INFO"/>
