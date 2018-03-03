@@ -5,7 +5,6 @@ import com.example.ShadowSocksShare.service.ShadowSocksSerivce;
 import com.example.ShadowSocksShare.service.impl.Free_ssCrawlerServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -32,6 +31,10 @@ public class ApplicationStartupListener {
 	@Async
 	@EventListener
 	public void handleOrderStateChange(ContextRefreshedEvent contextRefreshedEvent) {
-		crawlerSet.parallelStream()/*.filter((service) -> (service instanceof Free_ssCrawlerServiceImpl))*/.forEach((service) -> shadowSocksSerivce.crawlerAndSave(service));
+		try {
+			crawlerSet.parallelStream().filter((service) -> (service instanceof Free_ssCrawlerServiceImpl)).forEach((service) -> shadowSocksSerivce.crawlerAndSave(service));
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 }
