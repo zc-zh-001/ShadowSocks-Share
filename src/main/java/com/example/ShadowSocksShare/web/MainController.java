@@ -4,11 +4,14 @@ package com.example.ShadowSocksShare.web;
 import com.example.ShadowSocksShare.domain.ShadowSocksDetailsEntity;
 import com.example.ShadowSocksShare.domain.ShadowSocksEntity;
 import com.example.ShadowSocksShare.service.CountSerivce;
+import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
 import com.example.ShadowSocksShare.service.ShadowSocksSerivce;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.zxing.WriterException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -34,6 +37,10 @@ public class MainController {
 	private ShadowSocksSerivce shadowSocksSerivceImpl;
 	@Autowired
 	private CountSerivce countSerivce;
+	@Autowired
+	private ShadowSocksSerivce shadowSocksSerivce;
+	@Autowired
+	private ApplicationContext appContext;
 
 	/**
 	 * 首页
@@ -100,5 +107,18 @@ public class MainController {
 	@ResponseBody
 	public ResponseEntity<String> count() {
 		return ResponseEntity.ok().body(String.valueOf(countSerivce.get()));
+	}
+
+	@RequestMapping(value = "/run")
+	@ResponseBody
+	public ResponseEntity<String> run(String name) {
+		if (StringUtils.isNotBlank(name)) {
+			Object bean = appContext.getBean(name);
+
+			if (bean instanceof ShadowSocksCrawlerService) {
+				shadowSocksSerivce.crawlerAndSave(ShadowSocksCrawlerService.class.cast(bean));
+			}
+		}
+		return ResponseEntity.ok().body("OK...");
 	}
 }
