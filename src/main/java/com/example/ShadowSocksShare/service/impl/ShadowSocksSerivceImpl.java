@@ -117,7 +117,7 @@ public class ShadowSocksSerivceImpl implements ShadowSocksSerivce {
 	public void checkValid() {
 		// 查询 一小时前 更新的数据（即：一小时内更新过的数据，不测试有效性）
 		Date qDate = DateUtils.addHours(new Date(), -1);
-		PageRequest pageRequest = new PageRequest(0, 100, Sort.Direction.ASC, "id");
+		PageRequest pageRequest = PageRequest.of(0, 100, Sort.Direction.ASC, "id");
 		Page<ShadowSocksDetailsEntity> entityList = shadowSocksDetailsRepository.findByValidTimeLessThanEqual(qDate, pageRequest);
 
 		for (ShadowSocksDetailsEntity shadowSocksDetailsEntity : entityList.getContent()) {

@@ -3,12 +3,9 @@
 
 # ========== 默认配置 ==========
 server:
-  context-path: /
-  display-name: ShadowSocks-Share
-
-
-# ========== banner ==========
-banner.charset: UTF-8
+  servlet:
+    context-path: /
+    application-display-name: ShadowSocks-Share
 
 
 # ========== Spring ==========
@@ -24,12 +21,6 @@ spring:
     driver-class-name:  org.h2.Driver
     # username: sa
     # password: unrDG0Nb3r4l
-    # 关闭 Spring JDBC 初始化数据库
-    initialize: false
-    # 对数据库的结构进行操作
-    # schema: classpath:schema.sql
-    # 对数据操作
-    # data: classpath:data.sql
 
   # Spring H2 配置
   h2:
@@ -56,7 +47,7 @@ spring:
 
   # thymeleaf
   thymeleaf:
-    mode: HTML5
+    mode: HTML
     encoding: UTF-8
     cache: true
 
@@ -64,8 +55,8 @@ spring:
   messages:
     basename: i18n/messages
     encoding:  UTF-8
-    # 重载资源文件时间
-    cache-seconds: -1
+    # 加载的资源包文件缓存持续时间
+    cache-duration:
     # 没有特定的locale，则默认使用当下系统的设置
     fallback-to-system-local: true
 
