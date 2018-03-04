@@ -88,11 +88,11 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 				options.setBinary("D:\\software\\CentBrowser\\chrome.exe");
 				// options.addArguments("user-data-dir=D:\\software\\CentBrowser\\User Data");
 			} else {
-				options.setBinary(EnvironmentUtils.getProcEnvironment().get("GOOGLE_CHROME_SHIM"));
+				options.setBinary("/app/.apt/usr/bin/google-chrome");
 				options.addArguments("--headless");
 				options.addArguments("--disable-gpu");
 				options.addArguments("--no-sandbox");
-				options.addArguments("window-size=1200x600");
+				options.addArguments("--remote-debugging-port=9222");
 			}
 
 			if (ssProxyEnable) {
