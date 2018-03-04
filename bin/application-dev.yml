@@ -6,7 +6,7 @@ server:
 # 代理配置
 proxy:
   # 访问目标站点所用代理（除 free-ss）
-  enable: false
+  enable: true
   host: 127.0.0.1
   port: 1080
 
@@ -20,17 +20,17 @@ proxy:
 
 # phantomjs 路径
 phantomjs:
-  path: file:D:\ssr\phantomjs.exe
+  path: file:lib\phantomjs.exe
 
 
 #  因 Heroku 应用 30 分钟没有访问会自动休眠，为防止休眠，系统每 20 分钟访问一次该配置地址
 health:
-  url: https://shadowsocks-share.herokuapp.com/count
+  url:
   cron: 0 0/20 6-23 * * ?
 
 
 # spring boot 启用调试模式
-debug:  false
+debug: true
 
 
 # ========== Spring ==========
@@ -39,6 +39,6 @@ spring:
   datasource:
     platform: h2
     driver-class-name:  org.h2.Driver
-    url:  jdbc:h2:~/test
+    url: jdbc:h2:./data/db
     username: sa
-    password: unrDG0Nb3r4l
+    password:

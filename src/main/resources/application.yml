@@ -14,14 +14,6 @@ spring:
   profiles:
     active: prod
 
-  # Spring 数据库
-  datasource:
-    platform: h2
-    url:  jdbc:h2:~/test
-    driver-class-name:  org.h2.Driver
-    # username: sa
-    # password: unrDG0Nb3r4l
-
   # Spring H2 配置
   h2:
     console:

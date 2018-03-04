@@ -8,6 +8,19 @@
             </encoder>
         </appender>
 
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>logs/ShadowSocks-Share.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>logs/ShadowSocks-Share-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>7</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+            </encoder>
+            <append>false</append>
+            <prudent>false</prudent>
+        </appender>
+
         <logger name="com.example.ShadowSocksShare" level="DEBUG"/>
 
         <logger name="org.springframework.web" level="DEBUG"/>
@@ -16,6 +29,7 @@
 
         <root level="INFO">
             <appender-ref ref="STDOUT"/>
+            <appender-ref ref="FILE"/>
         </root>
     </springProfile>
 

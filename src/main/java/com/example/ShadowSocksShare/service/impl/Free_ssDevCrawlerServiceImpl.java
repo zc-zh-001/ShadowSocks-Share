@@ -104,6 +104,7 @@ public class Free_ssDevCrawlerServiceImpl extends ShadowSocksCrawlerService {
 			cliArgsCap.add("--proxy-type=socks5");*/
 			cliArgsCap.add("--ssl-protocol=any");
 			cliArgsCap.add("--script-encoding=utf8");
+			cliArgsCap.add("--webdriver-logfile=logs/phantomjsdriver.log");
 			cliArgsCap.add("--webdriver-loglevel=INFO");
 			cliArgsCap.add("--debug=false");
 			capability.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);

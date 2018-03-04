@@ -1,4 +1,9 @@
 # ========== 自定义 ==========
+# 服务端口号
+server:
+  port: 8080
+
+# 代理配置
 proxy:
   # 访问目标站点所用代理（除 free-ss）
   enable: true
@@ -15,7 +20,7 @@ proxy:
 
 # phantomjs 路径
 phantomjs:
-  path: file:D:\ssr\phantomjs.exe
+  path: file:D:\phantomjs.exe
 
 
 #  因 Heroku 应用 30 分钟没有访问会自动休眠，为防止休眠，系统每 20 分钟访问一次该配置地址
@@ -32,5 +37,8 @@ debug: true
 spring:
   # Spring 数据库
   datasource:
+    platform: h2
+    driver-class-name:  org.h2.Driver
+    url: jdbc:h2:~/test
     username: sa
     password:
