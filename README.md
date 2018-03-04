@@ -69,6 +69,7 @@ https://cloudfra.com/ | 是 | 从 0 点 10 分开始，每 3 小时
 1. 软件配置（一般不需要修改。配置文件路径：config\application-dev.yml）
 1. 执行 run.bat （Windows）
 1. 浏览器访问：[http://localhost:8080](http://localhost:8080)
+1. 初次扫描约 3 分钟，出现 “初始扫描完成...”即可使用
 
 ### Heroku 部署方法
 

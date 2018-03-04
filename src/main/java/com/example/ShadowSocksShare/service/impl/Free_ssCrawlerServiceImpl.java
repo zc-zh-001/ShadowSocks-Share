@@ -5,7 +5,6 @@ import com.example.ShadowSocksShare.domain.ShadowSocksEntity;
 import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.nodes.Document;
@@ -20,7 +19,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -65,8 +63,6 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 
 	@Autowired
 	private ResourceLoader resourceLoader;
-	@Autowired
-	private Environment env;
 
 	public ShadowSocksEntity getShadowSocks() {
 		WebDriver driver = null;

@@ -10,16 +10,15 @@ import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriverService;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,66 +53,20 @@ public class Free_ssDevCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	@Value("${proxy.free-ss.socks}")
 	private boolean ssSocks;
 
-	@Value("${phantomjs.path}")
-	private String phantomjsPath;
-
-	@Autowired
-	private ResourceLoader resourceLoader;
+	@Value("${driver.path}")
+	private String driverPath;
 
 	public ShadowSocksEntity getShadowSocks() {
 		// WebDriver driver = new RemoteWebDriver(new URL(serverUrl), capability);
 		WebDriver driver = null;
 		try {
-			// 设置必要参数
-			DesiredCapabilities capability = DesiredCapabilities.chrome();
-
-			// 设置代理
-			/*if (true) {
-				String proxyServer = "49.65.167.129" + ":" + 1080;
-				Proxy proxy = new Proxy();
-				// proxy.setAutodetect(false).setProxyType(Proxy.ProxyType.SYSTEM);
-				if (true) {
-					proxy.setSocksProxy(proxyServer);
-					proxy.setSocksVersion(5);
-				} else {
-					proxy.setHttpProxy(proxyServer).setFtpProxy(proxyServer).setSslProxy(proxyServer);
-				}
-				capability.setCapability(CapabilityType.PROXY, proxy);
-			}*/
-
-
-			// 参数配置：http://phantomjs.org/api/webpage/property/settings.html
-			capability.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "javascriptEnabled", true);
-			capability.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "loadImages", true);
-			capability.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "userAgent", userAgent); // userAgent
-			capability.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "webSecurityEnabled", false);
-
-			// SSL 证书支持
-			capability.setCapability("acceptSslCerts", true);
-			// 截屏支持
-			// capability.setCapability("takesScreenshot", false);
-			// CSS 搜索支持
-			capability.setCapability("cssSelectorsEnabled", true);
-			// JS 支持
-			capability.setJavascriptEnabled(true);
-			capability.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, resourceLoader.getResource(phantomjsPath).getFile().getAbsolutePath());
-
-			// 命令行选项：http://phantomjs.org/api/command-line.html
-			List<String> cliArgsCap = new ArrayList<>();
-			/*cliArgsCap.add("--proxy=49.65.167.129:1080");
-			cliArgsCap.add("--proxy-type=socks5");*/
-			cliArgsCap.add("--ssl-protocol=any");
-			cliArgsCap.add("--script-encoding=utf8");
-			cliArgsCap.add("--webdriver-logfile=logs/phantomjsdriver.log");
-			cliArgsCap.add("--webdriver-loglevel=INFO");
-			cliArgsCap.add("--debug=false");
-			capability.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);
-
-			driver = new PhantomJSDriver(capability);
+			System.setProperty("webdriver.edge.driver", driverPath);
+			// System.setProperty("webdriver.ie.driver.loglevel", "DEBUG");
+			driver = new EdgeDriver();
 			driver.manage().window().maximize();
-			// driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
-			// driver.manage().timeouts().pageLoadTimeout(TIME_OUT, TimeUnit.SECONDS);
-
+			driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(TIME_OUT, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(TIME_OUT, TimeUnit.SECONDS);
 			driver.get(TARGET_URL);
 
 			TimeUnit.SECONDS.sleep(10);
