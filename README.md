@@ -7,7 +7,7 @@
 > **注意：**
 > - 项目仅限编程学习、讨论使用，**请在适用法律允许的范围内使用**；
 > - 项目提供的信息，来自于其他共享站点，无法保证内容的准确性、可靠性、可用性、安全性；
-> - 关于高可用性：项目发布于免费的 heroku 云平台，受限于免费时间有限，项目可能会自动休眠或免费时间耗尽，无法提供稳定服务；
+> - 关于高可用性：项目发布于免费的 Heroku 云平台，受限于免费时间有限，项目可能会自动休眠或免费时间耗尽，无法提供稳定服务；
 > - 关于捐赠：项目只是收集信息而非服务提供者，顾不接受捐赠。请有能力的朋友直接支持源站点的发展。
 
 
@@ -62,6 +62,14 @@ https://cloudfra.com/ | 是 | 从 0 点 10 分开始，每 3 小时
 
 ## 系统部署
 
+### 项目部署（推荐）
+
+1. 运行环境：JAVA 8 或更高版本（[官方下载](http://www.oracle.com/technetwork/java/javase/downloads/index.html)）
+1. [下载](https://github.com/zc-zh-001/ShadowSocks-Share/releases)最新包，并解压
+1. 软件配置（一般不需要修改。配置文件路径：config\application-dev.yml）
+1. 执行 run.bat （Windows）
+1. 浏览器访问：[http://localhost:8080](http://localhost:8080)
+
 ### Heroku 部署方法
 
 请参考：
@@ -90,6 +98,7 @@ free-ss 代理 | PROXY_FREE-SS_SOCKS | proxy.free-ss.socks | boolean | false | �
 健康检查 | HEALTH_CRON | health.cron | string | 0 0/20 6-23 * * ? | health.url 访问频率
 
 > **注意：**
+> - Heroku 免费资源，内存太少，限制太多，造成部分网站账号抓取失败，推荐本地运行项目。
 > - 为避免爬虫太多对源站点产生影响及账号安全。**本站提供的服务能够满足需求时，请避免自行部署项目。**
 
 
