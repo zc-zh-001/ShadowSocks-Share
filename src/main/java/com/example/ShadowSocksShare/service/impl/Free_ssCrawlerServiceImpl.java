@@ -79,11 +79,12 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 
 				List<WebElement> divList = driver.findElements(By.xpath("//div[contains(@class, 'dataTables_wrapper')]"));
 				for (WebElement dev : divList) {
+					// log.debug("id =================>{}", dev.getAttribute("id"));
 					// log.debug("height =================>{}", dev.getSize().height);
 					// log.debug("isDisplayed =================>{}", dev.isDisplayed());
 					// log.debug("DIV innerHTML =================>{}", dev.getAttribute("innerHTML"));
 
-					if (dev.isDisplayed()) {
+					if (dev.getSize().height > 0) {
 						List<WebElement> trList = dev.findElements(By.xpath("./table/tbody/tr"));
 
 						Set<ShadowSocksDetailsEntity> set = Collections.synchronizedSet(new HashSet<>(trList.size()));
