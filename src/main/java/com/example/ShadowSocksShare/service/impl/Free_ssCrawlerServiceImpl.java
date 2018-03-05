@@ -22,10 +22,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -89,8 +86,9 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 					if (dev.isDisplayed()) {
 						List<WebElement> trList = dev.findElements(By.xpath("./table/tbody/tr"));
 
-						Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
-						for (WebElement tr : trList) {
+						Set<ShadowSocksDetailsEntity> set = Collections.synchronizedSet(new HashSet<>(trList.size()));
+
+						trList.parallelStream().forEach((tr) -> {
 							// log.debug("TR innerHTML =================>{}", tr.getAttribute("innerHTML"));
 							try {
 								String server = tr.findElement(By.xpath("./td[2]")).getText();
@@ -119,7 +117,7 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 							} catch (StaleElementReferenceException e) {
 								log.error(e.getMessage(), e);
 							}
-						}
+						});
 
 						// 3. 生成 ShadowSocksEntity
 						ShadowSocksEntity entity = new ShadowSocksEntity(TARGET_URL, driver.getTitle(), true, new Date());

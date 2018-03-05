@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * https://prom-php.herokuapp.com/cloudfra_ssr.txt
@@ -66,11 +64,12 @@ public class PromPHPCrawlerServiceImpl extends ShadowSocksCrawlerService {
 		String[] ssrLinkList = ssrLinks.split("\n");
 
 		// log.debug("---------------->{}={}", ssrLinkList.length + "", ssrLinkList);
-		Set<ShadowSocksDetailsEntity> set = new HashSet<>(ssrLinkList.length);
-		for (int i = 0; i < ssrLinkList.length; i++) {
+		Set<ShadowSocksDetailsEntity> set = Collections.synchronizedSet(new HashSet<>(ssrLinkList.length));
+
+		Arrays.asList(ssrLinkList).parallelStream().forEach((str) -> {
 			try {
-				if (StringUtils.isNotBlank(ssrLinkList[i])) {
-					ShadowSocksDetailsEntity ss = parseLink(ssrLinkList[i].trim());
+				if (StringUtils.isNotBlank(str)) {
+					ShadowSocksDetailsEntity ss = parseLink(str.trim());
 					ss.setValid(false);
 					ss.setValidTime(new Date());
 					ss.setTitle("免费账号 | 云端框架");
@@ -84,13 +83,14 @@ public class PromPHPCrawlerServiceImpl extends ShadowSocksCrawlerService {
 					// 无论是否可用都入库
 					set.add(ss);
 
-					log.debug("*************** 第 {} 条 ***************{}{}", i + 1, System.lineSeparator(), ss);
+					log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
 					// log.debug("{}", ss.getLink());
 				}
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
-		}
+		});
+
 		return set;
 	}
 
