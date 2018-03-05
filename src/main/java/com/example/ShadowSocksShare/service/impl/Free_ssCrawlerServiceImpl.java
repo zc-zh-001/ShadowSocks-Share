@@ -8,21 +8,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.nodes.Document;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Proxy;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +32,6 @@ import java.util.concurrent.TimeUnit;
  * https://free-ss.site/
  */
 @Slf4j
-@Profile("prod")
 @Service("free_ssCrawlerServiceImpl")
 public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	// 目标网站 URL
@@ -62,22 +60,160 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	private boolean ssSocks;
 
 	@Autowired
-	private ResourceLoader resourceLoader;
+	private DriverService driverService;
 
 	public ShadowSocksEntity getShadowSocks() {
 		WebDriver driver = null;
 		try {
+			driver = driverService.getDriver();
+
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(TIME_OUT, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(TIME_OUT, TimeUnit.SECONDS);
+
+			driver.get(TARGET_URL);
+
+			TimeUnit.SECONDS.sleep(5);
+
+			if (waitForAjax(driver)) {
+
+				TimeUnit.SECONDS.sleep(3);
+
+				List<WebElement> divList = driver.findElements(By.xpath("//div[contains(@class, 'dataTables_wrapper')]"));
+				for (WebElement dev : divList) {
+					// log.debug("height =================>{}", dev.getSize().height);
+					// log.debug("isDisplayed =================>{}", dev.isDisplayed());
+					// log.debug("DIV innerHTML =================>{}", dev.getAttribute("innerHTML"));
+
+					if (dev.isDisplayed()) {
+						List<WebElement> trList = dev.findElements(By.xpath("./table/tbody/tr"));
+
+						Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
+						for (WebElement tr : trList) {
+							// log.debug("TR innerHTML =================>{}", tr.getAttribute("innerHTML"));
+							try {
+								String server = tr.findElement(By.xpath("./td[2]")).getText();
+								String server_port = tr.findElement(By.xpath("./td[3]")).getText();
+								String password = tr.findElement(By.xpath("./td[4]")).getText();
+								String method = tr.findElement(By.xpath("./td[5]")).getText();
+
+								if (StringUtils.isNotBlank(server) && StringUtils.isNumeric(server_port) && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(method)) {
+									ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(server, Integer.parseInt(server_port), password, method, SS_PROTOCOL, SS_OBFS);
+									// 该网站账号默认为可用，不在此验证可用性
+									ss.setValid(true);
+									ss.setValidTime(new Date());
+									ss.setTitle("免费上网账号");
+									ss.setRemarks("https://free-ss.site/");
+									ss.setGroup("ShadowSocks-Share");
+
+									// 测试网络
+									if (isReachable(ss))
+										ss.setValid(true);
+
+									// 无论是否可用都入库
+									set.add(ss);
+
+									log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
+								}
+							} catch (StaleElementReferenceException e) {
+								log.error(e.getMessage(), e);
+							}
+						}
+
+						// 3. 生成 ShadowSocksEntity
+						ShadowSocksEntity entity = new ShadowSocksEntity(TARGET_URL, driver.getTitle(), true, new Date());
+						entity.setShadowSocksSet(set);
+						return entity;
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			if (driver != null) {
+				driver.quit();
+				// driver.close();
+			}
+		}
+		return new ShadowSocksEntity(TARGET_URL, "免费上网账号", false, new Date());
+	}
+
+
+	public boolean waitForAjax(WebDriver driver) {
+		WebDriverWait wait = new WebDriverWait(driver, 30, 500);
+		ExpectedCondition<Boolean> jQueryLoad = new ExpectedCondition<Boolean>() {
+			@Override
+			public Boolean apply(WebDriver driver) {
+				try {
+					return ((Long) ((JavascriptExecutor) driver).executeScript("return jQuery.active") == 0);
+				} catch (Exception e) {
+					return true;
+				}
+			}
+		};
+		ExpectedCondition<Boolean> jsLoad = new ExpectedCondition<Boolean>() {
+			@Override
+			public Boolean apply(WebDriver driver) {
+				return ((JavascriptExecutor) driver).executeScript("return document.readyState").toString().equals("complete");
+			}
+		};
+		return wait.until(jQueryLoad) && wait.until(jsLoad);
+	}
+
+	/**
+	 * 网页内容解析 ss 信息
+	 */
+	@Override
+	protected Set<ShadowSocksDetailsEntity> parse(Document document) {
+		return null;
+	}
+
+	/**
+	 * 目标网站 URL
+	 */
+	@Override
+	protected String getTargetURL() {
+		return TARGET_URL;
+	}
+
+	interface DriverService {
+		WebDriver getDriver() throws IOException;
+	}
+
+	@Profile("dev")
+	@Service("driverService")
+	class EdgeDriverService implements DriverService {
+		@Value("${driver.path}")
+		private String driverPath;
+
+		@Override
+		public WebDriver getDriver() {
+			System.setProperty("webdriver.edge.driver", driverPath);
+			// System.setProperty("webdriver.ie.driver.loglevel", "DEBUG");
+			return new EdgeDriver();
+		}
+	}
+
+	@Profile("prod")
+	@Service("driverService")
+	class ChromeDriverService implements DriverService {
+		@Autowired
+		private ResourceLoader resourceLoader;
+
+		@Override
+		public WebDriver getDriver() throws IOException {
 			/*System.setProperty("webdriver.chrome.logfile", "D:\\chromedriver.log");
 			System.setProperty("webdriver.chrome.verboseLogging", "true");*/
 
-			ChromeDriverService service = null;
+			org.openqa.selenium.chrome.ChromeDriverService service;
 
 			if (SystemUtils.IS_OS_WINDOWS) {
-				service = new ChromeDriverService.Builder().usingAnyFreePort()
+				service = new org.openqa.selenium.chrome.ChromeDriverService.Builder().usingAnyFreePort()
 						.usingDriverExecutable(resourceLoader.getResource("classpath:lib/chromedriver.exe").getFile())
 						.build();
 			} else {
-				service = new ChromeDriverService.Builder().usingAnyFreePort().build();
+				service = new org.openqa.selenium.chrome.ChromeDriverService.Builder().usingAnyFreePort().build();
 			}
 
 			ChromeOptions options = new ChromeOptions();
@@ -105,85 +241,7 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 				options.setCapability(CapabilityType.PROXY, proxy);
 			}
 
-			driver = new ChromeDriver(service, options);
-			driver.manage().timeouts().implicitlyWait(TIME_OUT, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(TIME_OUT, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(TIME_OUT, TimeUnit.SECONDS);
-
-			driver.get(TARGET_URL);
-
-			TimeUnit.SECONDS.sleep(15);
-
-			if (true) {
-				List<WebElement> divList = driver.findElements(By.xpath("//div[contains(@class, 'dataTables_wrapper')]"));
-				for (WebElement dev : divList) {
-					// log.debug("height =================>{}", dev.getSize().height);
-					// log.debug("isDisplayed =================>{}", dev.isDisplayed());
-					// log.debug("DIV innerHTML =================>{}", dev.getAttribute("innerHTML"));
-
-					if (dev.isDisplayed()) {
-						List<WebElement> trList = dev.findElements(By.xpath("./table/tbody/tr"));
-
-						Set<ShadowSocksDetailsEntity> set = new HashSet<>(trList.size());
-						for (WebElement tr : trList) {
-							// log.debug("TR innerHTML =================>{}", tr.getAttribute("innerHTML"));
-
-							String server = tr.findElement(By.xpath("./td[2]")).getText();
-							String server_port = tr.findElement(By.xpath("./td[3]")).getText();
-							String password = tr.findElement(By.xpath("./td[4]")).getText();
-							String method = tr.findElement(By.xpath("./td[5]")).getText();
-
-							if (StringUtils.isNotBlank(server) && StringUtils.isNumeric(server_port) && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(method)) {
-								ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(server, Integer.parseInt(server_port), password, method, SS_PROTOCOL, SS_OBFS);
-								// 该网站账号默认为可用，不在此验证可用性
-								ss.setValid(true);
-								ss.setValidTime(new Date());
-								ss.setTitle("免费上网账号");
-								ss.setRemarks("https://free-ss.site/");
-								ss.setGroup("ShadowSocks-Share");
-
-								// 测试网络
-								if (isReachable(ss))
-									ss.setValid(true);
-
-								// 无论是否可用都入库
-								set.add(ss);
-
-								log.debug("*************** 第 {} 条 ***************{}{}", set.size(), System.lineSeparator(), ss);
-							}
-						}
-
-						// 3. 生成 ShadowSocksEntity
-						ShadowSocksEntity entity = new ShadowSocksEntity(TARGET_URL, driver.getTitle(), true, new Date());
-						entity.setShadowSocksSet(set);
-						return entity;
-					}
-				}
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		} finally {
-			if (driver != null) {
-				driver.quit();
-				// driver.close();
-			}
+			return new ChromeDriver(service, options);
 		}
-		return new ShadowSocksEntity(TARGET_URL, "免费上网账号", false, new Date());
-	}
-
-	/**
-	 * 网页内容解析 ss 信息
-	 */
-	@Override
-	protected Set<ShadowSocksDetailsEntity> parse(Document document) {
-		return null;
-	}
-
-	/**
-	 * 目标网站 URL
-	 */
-	@Override
-	protected String getTargetURL() {
-		return MessageFormat.format(TARGET_URL, String.valueOf(System.currentTimeMillis()));
 	}
 }
