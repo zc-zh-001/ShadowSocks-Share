@@ -5,6 +5,7 @@ import com.example.ShadowSocksShare.domain.ShadowSocksEntity;
 import com.example.ShadowSocksShare.service.ShadowSocksCrawlerService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.nodes.Document;
@@ -226,8 +227,12 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 				options.setBinary("D:\\software\\CentBrowser\\chrome.exe");
 				// options.addArguments("user-data-dir=D:\\software\\CentBrowser\\User Data");
 			} else {
-				options.setBinary("/app/.apt/usr/bin/google-chrome");
+				String binaryPath = EnvironmentUtils.getProcEnvironment().get("GOOGLE_CHROME_SHIM");
+				log.debug("GOOGLE_CHROME_SHIM : {}", binaryPath);
+				log.debug("GOOGLE_CHROME_BIN : {}", EnvironmentUtils.getProcEnvironment().get("GOOGLE_CHROME_BIN"));
+				options.setBinary(binaryPath);
 				options.addArguments("--headless");
+				options.addArguments("window-size=1200x600");
 				options.addArguments("--disable-gpu");
 				// options.addArguments("--no-sandbox");
 				options.addArguments("--remote-debugging-port=9222");
