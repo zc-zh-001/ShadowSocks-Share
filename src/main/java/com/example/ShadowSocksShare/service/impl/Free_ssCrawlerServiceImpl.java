@@ -12,6 +12,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -34,7 +35,7 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	// 目标网站 URL
 	private static final String TARGET_URL = "https://free-ss.site/";
 	// userAgent
-	private static final String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36";
+	// private static final String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36";
 	// 访问目标网站，是否启动代理
 	@Value("${proxy.enable}")
 	@Getter
@@ -190,7 +191,11 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 		public WebDriver getDriver() {
 			System.setProperty("webdriver.edge.driver", driverPath);
 			// System.setProperty("webdriver.ie.driver.loglevel", "DEBUG");
-			return new EdgeDriver();
+
+			org.openqa.selenium.edge.EdgeDriverService service = org.openqa.selenium.edge.EdgeDriverService.createDefaultService();
+
+			EdgeOptions options = new EdgeOptions();
+			return new EdgeDriver(service, options);
 		}
 	}
 
@@ -224,8 +229,8 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 				options.setBinary("/app/.apt/usr/bin/google-chrome");
 				options.addArguments("--headless");
 				options.addArguments("--disable-gpu");
-				options.addArguments("--no-sandbox");
-				// options.addArguments("--remote-debugging-port=9222");
+				// options.addArguments("--no-sandbox");
+				options.addArguments("--remote-debugging-port=9222");
 			}
 
 			if (ssProxyEnable) {
