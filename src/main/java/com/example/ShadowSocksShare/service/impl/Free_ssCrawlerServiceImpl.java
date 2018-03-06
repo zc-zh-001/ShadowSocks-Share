@@ -235,7 +235,7 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 				options.addArguments("window-size=1200x600");
 				options.addArguments("--disable-gpu");
 				// options.addArguments("--no-sandbox");
-				options.addArguments("--remote-debugging-port=9222");
+				// options.addArguments("--remote-debugging-port=9222");
 			}
 
 			if (ssProxyEnable) {
