@@ -20,9 +20,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -203,9 +203,6 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	@Profile("prod")
 	@Service("driverService")
 	class ChromeDriverService implements DriverService {
-		@Autowired
-		private ResourceLoader resourceLoader;
-
 		@Override
 		public WebDriver getDriver() throws IOException {
 			/*System.setProperty("webdriver.chrome.logfile", "D:\\chromedriver.log");
@@ -215,7 +212,7 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 
 			if (SystemUtils.IS_OS_WINDOWS) {
 				service = new org.openqa.selenium.chrome.ChromeDriverService.Builder().usingAnyFreePort()
-						.usingDriverExecutable(resourceLoader.getResource("classpath:lib/chromedriver.exe").getFile())
+						.usingDriverExecutable(new File("D:\\chromedriver.exe"))
 						.build();
 			} else {
 				service = new org.openqa.selenium.chrome.ChromeDriverService.Builder().usingAnyFreePort().build();
@@ -226,6 +223,9 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 			if (SystemUtils.IS_OS_WINDOWS) {
 				options.setBinary("D:\\software\\CentBrowser\\chrome.exe");
 				// options.addArguments("user-data-dir=D:\\software\\CentBrowser\\User Data");
+				options.addArguments("--headless");
+				options.addArguments("window-size=1200x600");
+				options.addArguments("--disable-gpu");
 			} else {
 				String binaryPath = EnvironmentUtils.getProcEnvironment().get("GOOGLE_CHROME_SHIM");
 				log.debug("GOOGLE_CHROME_SHIM : {}", binaryPath);
