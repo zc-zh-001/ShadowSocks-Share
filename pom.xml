@@ -11,8 +11,20 @@
     <name>ShadowSocks-Share</name>
     <description>ShadowSocks-Share</description>
 
-    <!-- ghostdriver -->
     <repositories>
+        <repository>
+            <id>alimaven</id>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- ghostdriver -->
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
