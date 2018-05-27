@@ -96,8 +96,8 @@ public class Free_ssCrawlerServiceImpl extends ShadowSocksCrawlerService {
 							try {
 								String server = tr.findElement(By.xpath("./td[2]")).getText();
 								String server_port = tr.findElement(By.xpath("./td[3]")).getText();
-								String password = tr.findElement(By.xpath("./td[4]")).getText();
-								String method = tr.findElement(By.xpath("./td[5]")).getText();
+								String method = tr.findElement(By.xpath("./td[4]")).getText();
+								String password = tr.findElement(By.xpath("./td[5]")).getText();
 
 								if (StringUtils.isNotBlank(server) && StringUtils.isNumeric(server_port) && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(method)) {
 									ShadowSocksDetailsEntity ss = new ShadowSocksDetailsEntity(server, Integer.parseInt(server_port), password, method, SS_PROTOCOL, SS_OBFS);
