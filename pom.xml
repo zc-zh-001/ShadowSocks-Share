@@ -43,7 +43,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <!-- 自定义 -->
-        <selenium.version>3.10.0</selenium.version>
+        <selenium.version>3.12.0</selenium.version>
 
         <!-- 打包不测试 -->
         <skipTests>true</skipTests>
