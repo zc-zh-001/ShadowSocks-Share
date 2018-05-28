@@ -99,8 +99,6 @@ free-ss 代理 | PROXY_FREE-SS_ENABLE | proxy.free-ss.enable | boolean | true | 
 free-ss 代理 | PROXY_FREE-SS_HOST | proxy.free-ss.host | string | | 访问 free-ss 代理IP
 free-ss 代理 | PROXY_FREE-SS_PORT | proxy.free-ss.port | int | | 访问 free-ss 端口
 free-ss 代理 | PROXY_FREE-SS_SOCKS | proxy.free-ss.socks | boolean | false | 是否为 socks 代理
-健康检查 | HEALTH_URL | health.url | string | https://shadowsocks-share.herokuapp.com/count | Heroku 应用 30 分钟没有访问会自动休眠，为防止休眠，按 health.cron 频率访问该连接
-健康检查 | HEALTH_CRON | health.cron | string | 0 0/20 6-23 * * ? | health.url 访问频率
 
 > **注意：**
 > - Heroku 免费资源，内存太少，限制太多，造成部分网站账号抓取失败，推荐本地运行项目。

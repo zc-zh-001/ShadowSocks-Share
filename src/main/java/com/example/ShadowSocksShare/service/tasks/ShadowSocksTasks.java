@@ -22,8 +22,8 @@ public class ShadowSocksTasks {
 	@Autowired
 	private ShadowSocksSerivce shadowSocksSerivce;
 
-	@Value("${health.url}")
-	private String healthURL;
+	/*@Value("${health.url}")
+	private String healthURL;*/
 
 	@Autowired
 	@Qualifier("iShadowCrawlerServiceImpl")
@@ -119,9 +119,9 @@ public class ShadowSocksTasks {
 	/**
 	 * 为防止 herokuapp 休眠，每 10 分钟访问一次
 	 */
-	@Scheduled(cron = "${health.cron}")
+	/*@Scheduled(cron = "${health.cron}")
 	public void monitor() throws IOException {
 		if (StringUtils.isNotBlank(healthURL))
 			Jsoup.connect(healthURL).get();
-	}
+	}*/
 }
