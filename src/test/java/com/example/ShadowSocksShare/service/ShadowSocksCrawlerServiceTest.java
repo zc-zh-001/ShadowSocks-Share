@@ -1,18 +1,29 @@
 package com.example.ShadowSocksShare.service;
 
-import com.example.ShadowSocksShare.BaseTest;
 import com.example.ShadowSocksShare.domain.ShadowSocksEntity;
 import com.example.ShadowSocksShare.service.impl.IShadowCrawlerServiceImpl;
+import com.example.ShadowSocksShare.service.impl.WuwRedCrawlerServiceImpl;
 import com.google.zxing.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
 @Slf4j
-public class ShadowSocksCrawlerServiceTest extends BaseTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@Transactional
+@Rollback
+@ActiveProfiles("dev")
+public class ShadowSocksCrawlerServiceTest {
 	@Autowired
 	@Qualifier("iShadowCrawlerServiceImpl")
 	private ShadowSocksCrawlerService iShadowCrawlerServiceImpl;    // ishadow
@@ -41,8 +52,8 @@ public class ShadowSocksCrawlerServiceTest extends BaseTest {
 	@Qualifier("promPHPCrawlerServiceImpl")
 	private ShadowSocksCrawlerService promPHPCrawlerServiceImpl;
 	@Autowired
-	@Qualifier("iShadowCrawlerServiceImpl")
-	private IShadowCrawlerServiceImpl iShadowCrawlerService;
+	@Qualifier("wuwRedCrawlerServiceImpl")
+	private WuwRedCrawlerServiceImpl wuwRedCrawlerServiceImpl;
 
 	@Test
 	public void parseURL() throws IOException, NotFoundException {
@@ -50,10 +61,17 @@ public class ShadowSocksCrawlerServiceTest extends BaseTest {
 		free_yitianjianssCrawlerServiceImpl.parseURL(url);
 	}
 
-	// https://doub.io
+	// http://i.wuw.red/
+	@Test
+	public void testWuwRedService() {
+		ShadowSocksEntity entity = wuwRedCrawlerServiceImpl.getShadowSocks();
+		log.debug("========>{}", entity);
+	}
+
+	// ishadow
 	@Test
 	public void testIShadowService() {
-		ShadowSocksEntity entity = iShadowCrawlerService.getShadowSocks();
+		ShadowSocksEntity entity = iShadowCrawlerServiceImpl.getShadowSocks();
 		log.debug("========>{}", entity);
 	}
 

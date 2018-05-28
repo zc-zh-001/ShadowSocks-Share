@@ -76,7 +76,7 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.11.2</version>
+            <version>1.11.3</version>
         </dependency>
         <!-- PhantomJSDriver -->
         <!--<dependency>
@@ -162,7 +162,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
