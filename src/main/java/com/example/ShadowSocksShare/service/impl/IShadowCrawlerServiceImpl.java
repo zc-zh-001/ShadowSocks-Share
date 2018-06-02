@@ -25,7 +25,7 @@ import java.util.Set;
 @Service("iShadowCrawlerServiceImpl")
 public class IShadowCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	// 目标网站 URL
-	private static final String TARGET_URL = "https://global.ishadowx.net/";
+	private static final String TARGET_URL = "https://my.ishadowx.net/";
 	// 访问目标网站，是否启动代理
 	@Value("${proxy.enable}")
 	@Getter
