@@ -22,7 +22,7 @@ import java.util.Set;
 @Service
 public class FreeSS_EasyToUseCrawlerServiceImpl extends ShadowSocksCrawlerService {
 	// 目标网站 URL
-	private static final String TARGET_URL = "https://freess.cx/";
+	private static final String TARGET_URL = "https://ss.freess.org/";
 	// 访问目标网站，是否启动代理
 	@Value("${proxy.enable}")
 	@Getter
@@ -51,9 +51,9 @@ public class FreeSS_EasyToUseCrawlerServiceImpl extends ShadowSocksCrawlerServic
 			try {
 				Element element = ssList.get(i);
 				// 取 a 信息，为 ss 信息
-				String ssURL = element.select("a").first().absUrl("href");
+				String ssURL = element.select("a").first().attr("href");
 
-				ShadowSocksDetailsEntity ss = parseURL(ssURL);
+				ShadowSocksDetailsEntity ss = parseImg(ssURL);
 				ss.setValid(false);
 				ss.setValidTime(new Date());
 				ss.setTitle(document.title());

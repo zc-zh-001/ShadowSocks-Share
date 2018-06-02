@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -159,6 +160,29 @@ public abstract class ShadowSocksCrawlerService {
 
 		try (BufferedInputStream bytes = resultImageResponse.bodyStream()) {
 			BufferedImage image = ImageIO.read(bytes);
+			Binarizer binarizer = new HybridBinarizer(new BufferedImageLuminanceSource(image));
+			BinaryBitmap binaryBitmap = new BinaryBitmap(binarizer);
+			Result res = new MultiFormatReader().decode(binaryBitmap, hints);
+			return parseLink(res.toString());
+		}
+	}
+
+	/**
+	 * 图片解析
+	 */
+	protected ShadowSocksDetailsEntity parseImg(String imgURL) throws IOException, NotFoundException {
+		String str = StringUtils.removeFirst(imgURL, "data:image/png;base64,");
+
+		Map<DecodeHintType, Object> hints = new LinkedHashMap<>();
+		// 解码设置编码方式为：utf-8，
+		hints.put(DecodeHintType.CHARACTER_SET, StandardCharsets.UTF_8.name());
+		//优化精度
+		hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+		//复杂模式，开启PURE_BARCODE模式
+		hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
+
+		try (ByteArrayInputStream bis = new ByteArrayInputStream(Base64.decodeBase64(str))) {
+			BufferedImage image = ImageIO.read(bis);
 			Binarizer binarizer = new HybridBinarizer(new BufferedImageLuminanceSource(image));
 			BinaryBitmap binaryBitmap = new BinaryBitmap(binarizer);
 			Result res = new MultiFormatReader().decode(binaryBitmap, hints);
