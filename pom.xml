@@ -85,6 +85,17 @@
             <version>2.1.0</version>
         </dependency>-->
 
+        <!-- webjars -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>webjars-locator</artifactId>
+            <version>0.34</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>font-awesome</artifactId>
+            <version>4.7.0</version>
+        </dependency>
         <!-- WEB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

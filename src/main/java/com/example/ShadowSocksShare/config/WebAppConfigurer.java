@@ -24,7 +24,7 @@ public class WebAppConfigurer implements WebMvcConfigurer, ApplicationContextAwa
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		// 添加 计数 拦截器
-		registry.addInterceptor(new Interceptor(countSerivce)).addPathPatterns("/**").excludePathPatterns("/css/**", "/images/**", "/js/**", "/favicon.ico", "/count");
+		registry.addInterceptor(new Interceptor(countSerivce)).addPathPatterns("/**").excludePathPatterns("/webjars/**", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/count");
 		// 本地化拦截器
 		LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
 		localeChangeInterceptor.setParamName("language");
