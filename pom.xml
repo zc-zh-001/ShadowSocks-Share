@@ -14,7 +14,7 @@
     <repositories>
         <repository>
             <id>alimaven</id>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <url>https://maven.aliyun.com/nexus/content/groups/public/</url>
         </repository>
         <repository>
             <id>spring-milestones</id>
